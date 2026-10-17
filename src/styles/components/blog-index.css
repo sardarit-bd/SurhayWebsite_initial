@@ -1,0 +1,34 @@
+/* Aus src/layouts/BlogIndex.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-blog-index] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-blog-index="" an jedes eigene Element. */
+
+/* Zustand und Kurven stehen in global.css (.card-link, .read-more).
+     Vorher hoben sich die Karten beim Hover um 4 px an — das ist raus:
+     Anheben ist die Geste der Leistungs-Elemente, und wenn eine Blog-Karte
+     dasselbe tut, sind beide gleich laut. Hier antworten Rahmen, Flaeche
+     und das Link-Detail, mehr nicht.
+     Der Aufmacher liegt auf vertieftem Papier statt auf Weiss und braucht
+     deshalb einen eigenen, ebenso kleinen Schritt. */.feature-card[data-c-blog-index] {
+    --card-bg-hover: color-mix(in srgb, var(--color-paper) 45%, var(--color-paper-2));
+  }
+  /* Der Rahmen ist die Schaltflaeche — Bedienelement-Stufe statt Haarlinie
+     (WCAG 1.4.11, 3:1). */.topic-btn[data-c-blog-index] {
+    border-color: var(--line-control);
+    color: var(--color-mute);
+  }
+  @media (hover: hover) and (pointer: fine){
+    .topic-btn[data-c-blog-index]:hover {
+      color: var(--color-ink);
+      border-color: var(--color-ink);
+    }
+  }
+  .topic-btn.is-active[data-c-blog-index] {
+    background: var(--color-accent-600);
+    border-color: var(--color-accent-600);
+    color: var(--color-white);
+  }
+  .blog-card.is-filtered-out[data-c-blog-index] {
+    display: none;
+  }

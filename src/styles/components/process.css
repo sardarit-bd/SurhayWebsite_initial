@@ -1,0 +1,27 @@
+/* Aus src/components/sections/Process.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-process] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-process="" an jedes eigene Element. */
+
+/* Die grossen Ziffern in Outline-Optik.
+     Kein Hover: Ein Schritt ist Fliesstext mit Struktur, kein Ziel — eine
+     Antwort auf den Zeiger verspraeche einen Klick, den es hier nicht gibt.
+     Stattdessen faerbt sich die Ziffer, sobald ihr Schritt die vertikale
+     Bildschirmmitte kreuzt (.is-mid setzt Base.astro). */.step-number[data-c-process] {
+    -webkit-text-stroke: 1.5px var(--color-ink);
+    color: transparent;
+  }
+
+  /* Nur solange die Schritte gestapelt stehen. Ab md liegen zwei bis vier
+     nebeneinander und kreuzen die Mitte gleichzeitig — „immer nur eine
+     Ziffer“ waere dann nicht mehr einzuhalten, und vier gleichzeitig
+     aufleuchtende Ziffern waeren ohnehin kein Zustand, sondern ein Blinken. */@media (max-width: 767px){
+    .step-number[data-c-process] {
+      transition: -webkit-text-stroke-color var(--dur-short) var(--ease-out);
+    }
+    /* Rein laenger als raus: der Wechsel soll auffallen, die Ruecknahme nicht. */li.is-mid[data-c-process] .step-number[data-c-process] {
+      -webkit-text-stroke-color: var(--color-accent-600);
+      transition: -webkit-text-stroke-color 400ms var(--ease-out);
+    }
+  }

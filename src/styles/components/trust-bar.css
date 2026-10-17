@@ -1,0 +1,10 @@
+/* Aus src/components/sections/TrustBar.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-trust-bar] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-trust-bar="" an jedes eigene Element. */
+
+/* Der Akzentstrich markiert jeden Punkt als Zusage, nicht als Aufzählung. */.fact[data-c-trust-bar] {
+    padding-left: 1rem;
+    border-left: 2px solid var(--color-accent-400);
+  }

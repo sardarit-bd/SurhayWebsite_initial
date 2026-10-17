@@ -1,0 +1,546 @@
+/* Aus src/components/ContactForm.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-contact-form] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-contact-form="" an jedes eigene Element. */
+
+/* --------------------------------------------------------------- Grundriss
+     Der eigene Breakpoint 810 px steht schon im Designsystem (global.css) —
+     Tailwind kennt ihn nicht, deshalb hier als Media Query. */.cf-wrap[data-c-contact-form] {
+    /* Die Fehlerfarbe ist der einzige Wert, den das Designsystem noch nicht
+       kannte. #b3261e traegt auf Weiss 5.9:1 und erfuellt damit AA. Sie steht
+       hier statt in :root — gebraucht wird sie nur in diesem Bauteil. */
+    --cf-error: #b3261e;
+
+    /* Rahmenfarbe der Bedienelemente. Seit Felder und Kacheln keine eigene
+       Flaeche mehr tragen, ist der Rahmen das einzige, was sie sichtbar
+       macht — und damit „visual information required to identify user
+       interface components“ nach WCAG 2.2 SC 1.4.11: mindestens 3:1.
+       Die Haarlinie --line (Tinte bei 14 %) traegt auf Papier nur 1.2:1 und
+       faellt durch; 46 % derselben Tinte ergibt 3.1:1 auf Papier (#f5f3ee)
+       und 3.3:1 auf Weiss. Keine neue Farbe, nur eine andere Deckkraft. */
+    --cf-line: rgb(10 10 11 / 0.46);
+    max-width: 42rem;
+    /* Sprungziel der Paket-CTAs. Der Kopfbereich liegt fest ueber der Seite
+       und verdeckte sonst die ersten Zeilen — 6rem ist derselbe Abstand, den
+       die uebrigen Sprungziele der Seite als scroll-mt-24 fuehren. */
+    scroll-margin-top: 6rem;
+  }
+
+  /* --------------------------------------------------------- --cf-surface
+     Die Flaeche der Erfolgsmeldung — und nur noch ihre.
+
+     Felder und Kacheln lagen frueher als weisse Flaechen auf Papier; in der
+     globalen Anfrage-Sektion, wo das Formular in einer weissen Karte steht,
+     drehte --cf-surface den Kontrast auf Papier um. Beides ist entfallen:
+     Felder und Kacheln sind jetzt durchsichtig und tragen nur einen Rahmen,
+     der auf beiden Untergruenden gleich funktioniert. Die Erfolgsmeldung
+     braucht die abgesetzte Flaeche weiterhin — sie ersetzt das Formular und
+     soll als eigener Block lesbar sein. */.cf-form[data-c-contact-form] {
+    /* Bezugsrahmen fuer den absolut gesetzten Honeypot. */
+    position: relative;
+  }
+
+  .cf-required-note[data-c-contact-form] {
+    font-size: 0.8125rem;
+    color: var(--color-mute);
+  }
+
+  fieldset[data-c-contact-form] {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    /* Ohne das erzwingt die Voreinstellung min-content und sprengt das
+       Raster, sobald ein Chip breiter ist als seine Spalte. */
+    min-width: 0;
+  }
+
+  legend[data-c-contact-form] {
+    padding: 0;
+  }
+
+  /* Die Bloecke trennt Weissraum, keine Linie. Zwei Haarlinien quer durch
+     ein Formular mit sechs Feldern zerlegen es optisch in Kapitel, die es
+     inhaltlich nicht hat — und konkurrieren mit den Rahmen der Felder
+     darunter um dieselbe Aufmerksamkeit. */.cf-block[data-c-contact-form] {
+    margin-top: 3rem;
+  }
+
+  .cf-field[data-c-contact-form] + .cf-field[data-c-contact-form],
+  .cf-block[data-c-contact-form] > .cf-field[data-c-contact-form]:first-of-type {
+    margin-top: 1.75rem;
+  }
+
+  .cf-two[data-c-contact-form] {
+    display: grid;
+    gap: 1.75rem;
+    margin-top: 1.75rem;
+  }
+
+  .cf-two[data-c-contact-form] > .cf-field[data-c-contact-form] + .cf-field[data-c-contact-form] {
+    margin-top: 0;
+  }
+
+  /* Nur eines der Felder im Kontaktraster traegt einen Hilfstext (Telefon).
+     Ohne diese Regel saesse sein Eingabefeld genau um dessen Zeilenhoehe
+     tiefer als das daneben — zwei Felder derselben Reihe, die nicht mehr
+     fluchten. Die Zelle wird zur Spalte, das Feld an ihren Fuss gedrueckt:
+     damit stehen die Eingaben nebeneinander auf einer Linie, egal wie hoch
+     die Beschriftung darueber ausfaellt. */.cf-two[data-c-contact-form] > .cf-field[data-c-contact-form] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cf-two[data-c-contact-form] > .cf-field[data-c-contact-form] .cf-input[data-c-contact-form] {
+    margin-top: auto;
+  }
+
+  @media (min-width: 810px){
+    .cf-two[data-c-contact-form] {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  /* ------------------------------------------------------ Beschriftungen
+     Labels stehen immer sichtbar ueber dem Feld. Ein Platzhalter als
+     Label-Ersatz ist weg, sobald jemand tippt — genau dann, wenn die
+     Beschriftung gebraucht wird. */.cf-label[data-c-contact-form] {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  .cf-req[data-c-contact-form] {
+    margin-left: 0.15rem;
+    color: var(--color-accent-600);
+  }
+
+  .cf-hint[data-c-contact-form] {
+    margin-top: -0.25rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--color-mute);
+  }
+
+  /* ------------------------------------------------------------- Felder */
+
+  /* Felder und Kacheln liegen flach auf dem Untergrund: keine eigene
+     Flaeche, kein Schatten, nur ein Rahmen. Vorher standen weisse Felder auf
+     Papier und Papier-Felder auf der weissen Karte — zwei Flaechenwechsel,
+     die das Formular unruhiger machten, als es ist. */.cf-input[data-c-contact-form] {
+    display: block;
+    width: 100%;
+    /* min-height statt height: Bei erhoehten Textabstaenden (WCAG 1.4.12)
+       oder groesserer Schrift darf das Feld mitwachsen, statt den Text
+       abzuschneiden. */
+    min-height: 52px;
+    padding: 0 16px;
+    border: 1px solid var(--cf-line);
+    border-radius: 0.75rem;
+    background: transparent;
+    color: var(--color-ink);
+    font: inherit;
+    outline: none;
+    transition:
+      border-color var(--dur-micro) var(--ease-micro),
+      box-shadow var(--dur-micro) var(--ease-micro);
+  }
+
+  .cf-input[data-c-contact-form]::placeholder {
+    color: var(--color-mute);
+  }
+
+  .cf-textarea[data-c-contact-form] {
+    height: auto;
+    padding: 14px 16px;
+    line-height: 1.6;
+    resize: vertical;
+  }
+
+  /* ------------------------------------------------------------- Auswahl
+     Das Select traegt `.cf-input` und damit Hoehe, Rahmen, Radius, Polsterung
+     und Schrift der uebrigen Felder — hier steht nur, was es zusaetzlich
+     braucht. */.cf-select-wrap[data-c-contact-form] {
+    position: relative;
+  }
+
+  .cf-select[data-c-contact-form] {
+    appearance: none;
+    -webkit-appearance: none;
+    /* Platz fuer das Zeichen rechts, damit lange Optionstexte nicht darunter
+       laufen. */
+    padding-right: 2.75rem;
+    /* Safari setzt den Text sonst nicht auf die Mitte der Zeile. */
+    line-height: normal;
+    cursor: pointer;
+    /* Bei 280 px ist „Ich bin mir noch nicht sicher …“ breiter als das Feld.
+       Native Selects kuerzen selbst; das hier ist der Gurt dazu. */
+    text-overflow: ellipsis;
+  }
+
+  /* Solange nichts gewaehlt ist, greift `required` und das Feld ist ungueltig
+     — genau dann steht die Platzhalter-Option darin und wird so leise wie die
+     Platzhaltertexte der anderen Felder. Sobald etwas gewaehlt ist, traegt sie
+     die normale Textfarbe. */.cf-select[data-c-contact-form]:invalid {
+    color: var(--color-mute);
+  }
+
+  .cf-select-caret[data-c-contact-form] {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    width: 0.7rem;
+    height: 0.45rem;
+    transform: translateY(-50%);
+    color: var(--color-mute);
+    pointer-events: none;
+  }
+
+
+  @media (hover: hover) and (pointer: fine){
+    .cf-input[data-c-contact-form]:hover {
+      border-color: var(--color-ink);
+    }
+  }
+
+  /* Beim Fokus wird der Rahmen kraeftiger. Die halbe Pixelbreite liegt als
+     Innenschatten obendrauf, damit nichts springt. */.cf-input[data-c-contact-form]:focus {
+    border-color: var(--color-accent-600);
+    box-shadow: inset 0 0 0 0.5px var(--color-accent-600);
+  }
+
+  /* Der Ring stand hier als Kommentar („kommt vom globalen :focus-visible“),
+     kam aber nie an: `outline: none` oben traegt das Bereichs-Attribut und
+     ist damit spezifischer als die globale Regel in global.css. Tastatur-
+     nutzern blieb der Farbwechsel des Rahmens — zu wenig. Jetzt derselbe
+     Ring, den auch die Options-Kacheln und die Schaltflaechen tragen. */.cf-input[data-c-contact-form]:focus-visible {
+    outline: 3px solid var(--color-accent-600);
+    outline-offset: 3px;
+  }
+
+  /* ------------------------------------------------------------- Fehler
+     Farbe allein darf einen Fehler nie tragen: Text und Warnzeichen stehen
+     immer daneben. */.cf-field.is-error[data-c-contact-form] .cf-input[data-c-contact-form] {
+    border-color: var(--cf-error);
+  }
+
+  .cf-error[data-c-contact-form] {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: var(--cf-error);
+  }
+
+  .cf-error[hidden][data-c-contact-form] {
+    display: none;
+  }
+
+  .cf-error-icon[data-c-contact-form] {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    margin-top: 0.1rem;
+  }
+
+  /* --------------------------------------------------------- Kacheln (4.1)
+     Technisch Checkboxen, visuell Kacheln — ein div mit Klick-Handler waere
+     weder mit Tastatur noch mit Screenreader bedienbar. */.pick-grid[data-c-contact-form] {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 810px){
+    .pick-grid[data-c-contact-form] {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .pick-tile[data-c-contact-form] {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 60px;
+    padding: 0.9rem 2.5rem 0.9rem 1rem;
+    border: 1px solid var(--cf-line);
+    border-radius: 0.75rem;
+    background: transparent;
+    cursor: pointer;
+    transition:
+      border-color var(--dur-micro) var(--ease-micro),
+      box-shadow var(--dur-micro) var(--ease-micro),
+      background-color var(--dur-short) var(--ease-out);
+  }
+
+  .pick-tile-icon[data-c-contact-form] {
+    color: var(--color-accent-600);
+  }
+
+  .pick-tile-label[data-c-contact-form] {
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .pick-check[data-c-contact-form] {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.9rem;
+    width: 16px;
+    height: 16px;
+    color: var(--color-accent-600);
+    opacity: 0;
+    transition: opacity var(--dur-short) var(--ease-out);
+  }
+
+  /* Ausgewaehlt traegt drei Merkmale, von denen zwei ohne Farbe auskommen:
+     der Haken oben rechts, der kraeftigere Rahmen (der Innenschatten legt
+     das zweite Pixel darauf, ohne dass die Kachel springt) — und erst
+     drittens die Akzentfarbe. Der Farbschleier ist so leise, dass er ueber
+     Papier wie ueber Weiss funktioniert. */.pick-tile[data-c-contact-form]:has(input:checked) {
+    border-color: var(--color-accent-600);
+    box-shadow: inset 0 0 0 1px var(--color-accent-600);
+    background: color-mix(in srgb, var(--color-accent-600) 5%, transparent);
+  }
+
+  .pick-tile[data-c-contact-form]:has(input:checked) .pick-check[data-c-contact-form] {
+    opacity: 1;
+  }
+
+  /* Keine Bewegung: die Kachel ist vollstaendig Klickflaeche und muss beim
+     Zielen stillhalten. */@media (hover: hover) and (pointer: fine){
+    .pick-tile[data-c-contact-form]:hover {
+      border-color: var(--color-accent-600);
+    }
+  }
+
+  /* Derselbe Fokusring wie ueberall sonst auf der Seite (global.css) — nur
+     wandert er von der versteckten Checkbox auf die sichtbare Kachel. */.pick-tile[data-c-contact-form]:has(input:focus-visible) {
+    outline: 3px solid var(--color-accent-600);
+    outline-offset: 3px;
+  }
+
+  /* ------------------------------------------------------- Einwilligung
+     Nicht vorausgewaehlt — eine vorausgewaehlte Einwilligung ist unwirksam. */
+
+  /* Auch hier trennt Weissraum statt einer Linie. */.cf-consent-field[data-c-contact-form] {
+    margin-top: 3rem;
+  }
+
+  .cf-consent[data-c-contact-form] {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    cursor: pointer;
+  }
+
+  .cf-consent-box[data-c-contact-form] {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    margin-top: 0.1rem;
+    accent-color: var(--color-accent-600);
+  }
+
+  /* Eine Stufe kleiner und leiser als die Feldbeschriftungen: die
+     Einwilligung ist Pflichttext, kein Argument. */.cf-consent-text[data-c-contact-form] {
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: var(--color-mute);
+  }
+
+  .cf-field.is-error[data-c-contact-form] .cf-consent-box[data-c-contact-form] {
+    outline: 2px solid var(--cf-error);
+    outline-offset: 2px;
+  }
+
+  /* ---------------------------------------------------------- Absenden */.cf-submit[data-c-contact-form] {
+    margin-top: 2rem;
+    width: 100%;
+  }
+
+  @media (min-width: 810px){
+    .cf-submit[data-c-contact-form] {
+      width: auto;
+    }
+  }
+
+  .cf-submit-note[data-c-contact-form] {
+    margin-top: 0.85rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--color-mute);
+  }
+
+  /* Untergeordnet zur Schaltflaeche: dieselbe Groesse wie die Notiz darueber,
+     keine eigene Flaeche, kein zweiter Knopf. Die Zeile bricht auf schmalen
+     Viewports von selbst um. */.cf-alt[data-c-contact-form] {
+    margin-top: 0.4rem;
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    color: var(--color-mute);
+  }
+
+  .cf-alt-sep[data-c-contact-form] {
+    margin-inline: 0.45rem;
+    color: var(--color-mute);
+  }
+
+  /* Der Spinner haelt im Ruhezustand keinen Platz. Waehrend des Sendens
+     friert JS die Breite ein, damit der Button nicht springt. */.cf-spinner[data-c-contact-form] {
+    display: none;
+    width: 16px;
+    height: 16px;
+    flex: none;
+    border-radius: 50%;
+    border: 2px solid rgb(255 255 255 / 0.35);
+    border-top-color: var(--color-white);
+    animation: cf-spin 700ms linear infinite;
+  }
+
+  .cf-submit.is-sending[data-c-contact-form] .cf-spinner[data-c-contact-form] {
+    display: block;
+  }
+
+  .cf-submit.is-sending[data-c-contact-form] .btn-arrow[data-c-contact-form] {
+    display: none;
+  }
+
+  @keyframes cf-spin{
+    to{
+      transform: rotate(360deg);
+    }
+  }
+
+  /* ------------------------------------------------- Erfolg und Fehlschlag */.cf-success[data-c-contact-form] {
+    padding: 2rem;
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+    background: var(--cf-surface, var(--color-white));
+    animation: cf-success-in var(--dur-base) var(--ease-out) both;
+  }
+
+  .cf-success[hidden][data-c-contact-form] {
+    display: none;
+  }
+
+  .cf-success-text[data-c-contact-form] {
+    margin-top: 1rem;
+    line-height: 1.7;
+    color: var(--color-mute);
+  }
+
+  .cf-success-home[data-c-contact-form] {
+    display: inline-block;
+    margin-top: 1.5rem;
+    font-weight: 600;
+  }
+
+  #cf-success-title[data-c-contact-form]:focus {
+    outline: none;
+  }
+
+  #cf-success-title[data-c-contact-form]:focus-visible {
+    outline: 3px solid var(--color-accent-600);
+    outline-offset: 3px;
+  }
+
+  @keyframes cf-success-in{
+    from{
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+
+  .cf-fail[data-c-contact-form] {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    margin-bottom: 1.75rem;
+    padding: 1rem 1.15rem;
+    border: 1px solid var(--cf-error);
+    border-radius: 0.75rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--cf-error);
+  }
+
+  .cf-fail[hidden][data-c-contact-form] {
+    display: none;
+  }
+
+  .cf-fail-icon[data-c-contact-form] {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    margin-top: 0.25rem;
+  }
+
+  /* --------------------------------------------------------------- Honeypot
+     Nicht display:none — das lesen Bots als Falle. Aus dem Sichtfeld
+     geschoben, ohne horizontale Scrollleiste (body hat overflow-x: clip). */.cf-hp[data-c-contact-form] {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  /* ------------------------------------------------------- Enge Viewports */@media (max-width: 389px){
+    .cf-input[data-c-contact-form] {
+      min-height: 48px;
+      padding-left: 14px;
+      padding-right: 14px;
+    }
+
+    .cf-textarea[data-c-contact-form] {
+      height: auto;
+      padding: 12px 14px;
+    }
+
+    /* Die Regel darueber setzt die Polsterung beidseitig auf 14 px und stuende
+       sonst spaeter im Stylesheet als die des Selects — der laengste
+       Optionstext liefe dann unter den Haken. */.cf-select[data-c-contact-form] {
+      padding-right: 2.5rem;
+    }
+
+    .cf-select-caret[data-c-contact-form] {
+      right: 0.875rem;
+    }
+  }
+
+  /* ------------------------------------------------------ Reduzierte Bewegung
+     Der Erfolgsblock kommt ohne Weg, nur ueber die Deckkraft. Der Spinner
+     bleibt als Zustandsanzeige, pulst aber statt zu rotieren. */@media (prefers-reduced-motion: reduce){
+    .cf-success[data-c-contact-form] {
+      animation: cf-success-fade var(--dur-micro) var(--ease-micro) both;
+    }
+
+    @keyframes cf-success-fade{
+      from{
+        opacity: 0;
+      }
+    }
+
+    /* Hover, Fokus und Auswahl schalten hart um, statt ueberzublenden. */.cf-input[data-c-contact-form],
+.pick-tile[data-c-contact-form],
+.pick-check[data-c-contact-form] {
+      transition: none;
+    }
+
+    .cf-spinner[data-c-contact-form] {
+      animation: cf-pulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes cf-pulse{
+      50%{
+        opacity: 0.4;
+      }
+    }
+  }

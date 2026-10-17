@@ -1,0 +1,157 @@
+/* Aus src/components/Footer.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-footer] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-footer="" an jedes eigene Element. */
+
+/* ------------------------------------------------------- Untere Zeile
+     Drei Bereiche: Copyright, Rechtslinks, Herkunftszeile. Die Anordnung
+     wechselt zweimal, weil die Zeile drei sehr unterschiedliche Breiten
+     bedienen muss:
+
+       ab 1040 px   alles nebeneinander, Rechtslinks in der Mitte
+       bis 1039 px  Copyright und Herkunft teilen sich Zeile eins,
+                    die Rechtslinks bekommen eine eigene Zeile
+       bis 559 px   alles untereinander — nebeneinander wuerde hier nur
+                    noch umbrechen und dabei unruhig aussehen
+       bis 390 px   die Rechtslinks untereinander statt umbrechend
+
+     WARUM 1040 UND NICHT 810
+     Gemessen wird die Zeile erst ab 1032 px einzeilig (deutsche Fassung:
+     Copyright 321 px, Rechtslinks 360 px, Herkunftszeile 224 px, dazu
+     Luecken und Polster). Bei 810 px brechen die Links auf drei Zeilen um
+     — die Zeile waere dort nicht einzeilig, sondern kaputt. Der Wert liegt
+     knapp ueber dem gemessenen Bedarf und dicht am Spaltenwechsel des
+     Rasters darueber (1024 px), damit die Fusszeile als Ganzes an
+     ungefaehr derselben Stelle umbricht.
+     Wer die Beschriftungen aendert, prueft diese Grenze neu. */.footer-bottom[data-c-footer] {
+    display: grid;
+    grid-template-areas:
+      'copy made'
+      'legal legal';
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 0.9rem 1.5rem;
+  }
+
+  .footer-bottom__copy[data-c-footer] {
+    grid-area: copy;
+  }
+
+  .footer-bottom__made[data-c-footer] {
+    grid-area: made;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .footer-legal[data-c-footer] {
+    grid-area: legal;
+    /* Sicherheitsnetz fuer 280 px: „Cookie-Einstellungen“ darf notfalls
+       brechen, statt die Zeile aus dem Viewport zu schieben. */
+    overflow-wrap: break-word;
+  }
+
+  .footer-legal[data-c-footer] ul[data-c-footer] {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 0.85rem;
+  }
+
+  .footer-legal[data-c-footer] li[data-c-footer] {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  /* ------------------------------------------------------- Die Links
+     Sie stehen zwischen zwei Saetzen in derselben gedaempften Farbe. Waeren
+     sie ebenfalls gedaempft und nur durch die Farbe markiert, waeren sie von
+     Fliesstext nicht zu unterscheiden — deshalb heller (Papier auf Tinte,
+     17.8:1) UND dauerhaft unterstrichen. Die Unterstreichung ist im Ruhe-
+     zustand zurueckgenommen und zieht bei Hover und Fokus an; erkennbar ist
+     der Link auch ohne diese Reaktion. */.footer-legal__link[data-c-footer] {
+    color: var(--color-paper);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: rgb(245 243 238 / 0.45);
+    text-underline-offset: 0.3em;
+    transition: text-decoration-color var(--dur-micro) var(--ease-micro);
+  }
+
+  .footer-legal__link[data-c-footer]:hover,
+  .footer-legal__link[data-c-footer]:focus-visible {
+    text-decoration-color: currentColor;
+    text-decoration-thickness: 2px;
+  }
+
+  /* Die geoeffnete Seite bleibt als Link bedienbar, traegt aber den Akzent —
+     dieselbe Rolle wie aria-current="page" fuer die Vorlesesoftware. */.footer-legal__link[aria-current='page'][data-c-footer] {
+    text-decoration-color: var(--color-accent-400);
+    text-decoration-thickness: 2px;
+  }
+
+  .footer-legal__sep[data-c-footer] {
+    color: var(--color-mute-dark);
+  }
+
+  @media (min-width: 1040px){
+    .footer-bottom[data-c-footer] {
+      grid-template-areas: 'copy legal made';
+      grid-template-columns: auto 1fr auto;
+    }
+
+    .footer-legal[data-c-footer] {
+      justify-self: center;
+    }
+
+    .footer-bottom__made[data-c-footer] {
+      justify-self: end;
+    }
+  }
+
+  /* Sobald die Rechtslinks eine eigene Zeile haben, wird eher getippt als
+     geklickt: 44 px Mindesthoehe je Link und spuerbarer Abstand dazwischen,
+     damit man nicht den Nachbarn trifft. */@media (max-width: 1039px){
+    .footer-legal[data-c-footer] ul[data-c-footer] {
+      gap: 0 1.1rem;
+    }
+
+    .footer-legal[data-c-footer] li[data-c-footer] {
+      gap: 1.1rem;
+    }
+
+    .footer-legal__link[data-c-footer] {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
+
+  @media (max-width: 559px){
+    .footer-bottom[data-c-footer] {
+      grid-template-areas:
+        'copy'
+        'legal'
+        'made';
+      grid-template-columns: 1fr;
+    }
+
+    .footer-bottom__made[data-c-footer] {
+      justify-self: start;
+    }
+  }
+
+  /* Ab hier stehen drei Links nicht mehr sauber nebeneinander: untereinander,
+     ohne Trenner — der haette sonst nichts mehr zu trennen. */@media (max-width: 390px){
+    .footer-legal[data-c-footer] ul[data-c-footer] {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+    }
+
+    .footer-legal__sep[data-c-footer] {
+      display: none;
+    }
+  }
