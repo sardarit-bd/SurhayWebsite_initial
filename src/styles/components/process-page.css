@@ -1,0 +1,21 @@
+/* Aus src/components/pages/ProcessPage.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-process-page] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-process-page="" an jedes eigene Element. */
+
+/* Outline-Ziffern wie auf der Startseite.
+     Kein Hover: Eine ganze Phase ist kein Ziel und kann keinen Klick
+     einloesen. Stattdessen faerbt sich die Ziffer, sobald ihre Phase die
+     vertikale Bildschirmmitte kreuzt (.is-mid setzt Base.astro).
+     Anders als auf der Startseite ohne Breitengrenze: Die Phasen stehen
+     hier auf jeder Breite untereinander, es kreuzt also immer nur eine. */.phase-number[data-c-process-page] {
+    -webkit-text-stroke: 1.5px var(--color-ink);
+    color: transparent;
+    transition: -webkit-text-stroke-color var(--dur-short) var(--ease-out);
+  }
+
+  /* Rein laenger als raus: der Wechsel soll auffallen, die Ruecknahme nicht. */li.is-mid[data-c-process-page] .phase-number[data-c-process-page] {
+    -webkit-text-stroke-color: var(--color-accent-600);
+    transition: -webkit-text-stroke-color 400ms var(--ease-out);
+  }

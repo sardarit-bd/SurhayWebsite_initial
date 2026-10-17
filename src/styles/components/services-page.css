@@ -1,0 +1,24 @@
+/* Aus src/components/pages/ServicesPage.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-services-page] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-services-page="" an jedes eigene Element. */
+
+/* Die ganze Karte ist klickbar, ohne den Titel-Link zu verstecken:
+     ein aufgespanntes ::after uebernimmt die Flaeche. Den Hover-Zustand
+     traegt der Kreis (global.css, Flaechen-Hover): die Karte hebt sich
+     nicht, und "Mehr erfahren" bekommt bewusst keinen eigenen Hover —
+     zwei Effekte auf einer Klickflaeche wuerden gegeneinander laufen.
+
+     Bewusst NICHT .card-link: das ist inzwischen das geteilte Muster der
+     Blog- und Preis-Karten (Stufe 2, Rahmen und Flaeche). Diese Karte ist
+     Stufe 1 und traegt den Kreis; beides zusammen legte eine helle Kachel
+     unter die Ueberschrift, solange die Fuellung sie noch nicht erreicht
+     hat. Gleiche Aufgabe, anderer Zustand — also ein eigener Name. */.card-cover[data-c-services-page] {
+    text-decoration: none;
+  }
+  .card-cover[data-c-services-page]::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }

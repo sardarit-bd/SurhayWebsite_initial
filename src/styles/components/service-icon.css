@@ -1,0 +1,13 @@
+/* Aus src/components/ServiceIcon.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-service-icon] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-service-icon="" an jedes eigene Element. */
+
+/* Groesse aus CSS, nicht aus width/height am SVG — so bleibt eine einzige
+     Quelle fuer Groesse und Strichstaerke. */.service-icon[data-c-service-icon] {
+    display: block;
+    flex: none;
+    width: var(--service-icon-size);
+    height: var(--service-icon-size);
+  }

@@ -1,0 +1,43 @@
+/* Aus src/components/pages/ContactPage.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-contact-page] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-contact-page="" an jedes eigene Element. */
+
+/* Zwei Spalten erst ab 1024 px, nicht schon ab 810.
+     Bei 810 px blieben dem Formular 411 px: Name und E-Mail nebeneinander je
+     166 px breit, die Options-Kacheln 200 px — zu eng fuer Beschriftungen wie
+     „Ich bin mir noch nicht sicher“. Die Seitenspalte traegt Begleitinfo,
+     nicht die Handlung; sie rutscht deshalb in diesem Bereich unter das
+     Formular, das damit die volle Breite bekommt.
+     1024 px ist ausserdem der Punkt, ab dem die Spalte klebt (lg:sticky) —
+     vorher setzte das Raster 214 px frueher um als das Kleben. */.contact-grid[data-c-contact-page] {
+    display: grid;
+    gap: 3.5rem;
+  }
+
+  /* Ein Rasterfeld ist von Haus aus mindestens so breit wie sein laengstes
+     Wort. Die Seitenspalte enthaelt die E-Mail-Adresse und die Telefonnummer
+     — bei doppelter Schriftgroesse sprengte das die 2fr-Spalte und schob die
+     Seite aus dem Fenster. min-width: 0 erlaubt dem Feld zu schrumpfen, den
+     Rest erledigt der Wortumbruch aus global.css. */.contact-grid[data-c-contact-page] > *[data-c-contact-page] {
+    min-width: 0;
+  }
+
+  /* Die Schwelle steht in `em` statt in Pixeln: 64em sind bei Standardschrift
+     dieselben 1024 px, um die es oben geht — aber wenn jemand die
+     Schriftgroesse des Browsers hochsetzt (WCAG 1.4.4), wandert sie mit, und
+     die beiden Spalten stapeln sich rechtzeitig, statt sich gegenseitig aus
+     dem Fenster zu druecken. Dieselbe Ueberlegung wie bei der
+     Navigationsschwelle in Header.astro. */@media (min-width: 64em){
+    .contact-grid[data-c-contact-page] {
+      grid-template-columns: 3fr 2fr;
+      gap: 4rem;
+    }
+  }
+
+  @media (min-width: 75em){
+    .contact-grid[data-c-contact-page] {
+      gap: 5rem;
+    }
+  }

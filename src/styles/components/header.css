@@ -1,0 +1,458 @@
+/* Aus src/components/Header.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-header] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-header="" an jedes eigene Element. */
+
+/* ------------------------------------------------- Zwei Schwellen in em
+     Beide Umschaltpunkte rechnen in `em`, nicht in Pixeln — und das ist der
+     Punkt: `em` bezieht sich in einer Media Query auf die Grundschriftgroesse
+     des Browsers. Wer sie auf 200 % stellt (WCAG 1.4.4), verdoppelt damit die
+     Schwelle, und die Leiste wechselt rechtzeitig in die Burger-Fassung. Mit
+     `lg:` (1024 px) blieb die offene Navigation stehen und lief aus dem
+     Fenster.
+
+     64em  offene Navigation ab hier (= 1024 px bei 16 px Grundschrift)
+     30em  Aufruf in der Leiste ab hier (= 480 px)
+
+     Die 30em sind kein Geschmack: Logo, Sprachumschalter, Aufruf und Burger
+     brauchen zusammen mehr Platz, als ein 360-px-Telefon hat — der Burger
+     landete dort ausserhalb des Fensters und wurde vom `overflow-x: clip`
+     des Body abgeschnitten. Der Aufruf geht nicht verloren, er steht im
+     Menue als Punkt und noch einmal als Schaltflaeche.
+
+     Custom Properties sind in Media Queries nicht erlaubt, die Werte stehen
+     deshalb ausgeschrieben. Wer eine aendert, aendert sie hier und im
+     Skript unten (DESKTOP_NAV_AB). */.desktop-nav[data-c-header] {
+    display: none;
+  }
+
+  .menu-sheet[data-c-header],
+  .menu-toggle[data-c-header] {
+    display: flex;
+  }
+
+  @media (min-width: 64em){
+    .desktop-nav[data-c-header] {
+      display: flex;
+    }
+    .menu-sheet[data-c-header],
+    .menu-toggle[data-c-header] {
+      display: none;
+    }
+    .header-right[data-c-header] {
+      margin-left: 0;
+    }
+  }
+
+  .header-cta[data-c-header] {
+    display: none;
+  }
+
+  @media (min-width: 30em){
+    .header-cta[data-c-header] {
+      display: inline-flex;
+    }
+  }
+
+  /* Die Leiste liegt ueber dem Menue-Blatt (--z-leiste > --z-blatt), damit
+     Logo und Schliessen-Kreuz beim offenen Menue erreichbar bleiben.
+     Am Seitenanfang transparent; erst beim Scrollen legt sich Blur darunter. */.header-bar[data-c-header] {
+    background: transparent;
+    transition: background-color var(--dur-short) var(--ease-micro);
+  }
+  header.scrolled .header-bar[data-c-header] {
+    background: color-mix(in srgb, var(--color-paper) 82%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  /* HIER SASS DER FEHLER. Vorher stand an dieser Stelle `background:
+     transparent`. Die Leiste lag damit zwar ueber dem Blatt, hatte aber keine
+     eigene Flaeche — die Menuepunkte scrollten sichtbar unter ihr hindurch und
+     landeten als zweiter Text unter dem Logo.
+
+     Deckend, nicht durchscheinend: Ein Blur oder ein Farbanteil unter 100 %
+     laesst bei schneller Bewegung immer noch Buchstaben durch. Die Flaeche
+     traegt deshalb denselben Vollton wie das Blatt darunter (`bg-ink`), damit
+     die Grenze zwischen beiden gar nicht erst als Kante auffaellt.
+
+     Diese Regel muss NACH `.scrolled` stehen: beide haben dieselbe
+     Spezifitaet, entschieden wird ueber die Reihenfolge. */header.menu-open .header-bar[data-c-header] {
+    background: var(--color-ink);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  header.menu-open .brand-main[data-c-header] {
+    color: var(--color-paper);
+  }
+  header.menu-open .brand-sub[data-c-header] {
+    color: var(--color-mute-dark);
+  }
+
+  /* ------------------------------------------------ Desktop-Navigation */.nav-link[data-c-header] {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.55rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.925rem;
+    font-weight: 550;
+    color: var(--color-ink);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color var(--dur-micro) var(--ease-micro);
+  }
+
+  /* Der Punkt statt einer Unterstreichung: Er muss auch dann erkennbar sein,
+     wenn daneben ein Menue aufklappt. Ein Element traegt beide Rollen — die
+     aktive Seite zeigt ihn dauerhaft, jeder andere Punkt zeigt ihn als
+     Antwort auf den Zeiger. Zwei getrennte Punkte waeren an derselben Stelle
+     doppelt gemoppelt. */.nav-link[data-c-header]::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0.1rem;
+    width: 0.3rem;
+    height: 0.3rem;
+    margin-left: -0.15rem;
+    border-radius: 50%;
+    background: var(--color-accent-600);
+    opacity: 0;
+    transform: scale(0.4);
+    transition:
+      opacity var(--dur-short) var(--ease-out),
+      transform var(--dur-short) var(--ease-out);
+  }
+
+  /* Der Punkt der aktiven Seite steht fest und wird vom Hover nicht
+     angefasst — sonst wuerde die Ortsangabe zur Zeigerantwort. */.nav-link.is-active[data-c-header] {
+    color: var(--color-ink);
+  }
+  .nav-link.is-active[data-c-header]::before {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  /* Vorher legte sich beim Hover eine graue Pille unter den Menuepunkt. Die
+     ist raus: Farbe und Punkt sagen dasselbe leiser, und die Pille konkurriert
+     auf jeder Seite mit dem aktiven Punkt daneben. */.nav-link[data-c-header]:focus-visible {
+    color: var(--color-accent-600);
+  }
+  .nav-link[data-c-header]:focus-visible::before {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (hover: hover) and (pointer: fine){
+    .nav-link[data-c-header]:hover {
+      color: var(--color-accent-600);
+    }
+    .nav-link[data-c-header]:hover::before {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Sieben Punkte kommen bei 1024 px sonst der Schaltflaeche zu nahe; ab xl
+     ist wieder Platz fuer den urspruenglichen Abstand. */@media (min-width: 64em) and (max-width: 79.99em){
+    .nav-link[data-c-header] {
+      padding-inline: 0.6rem;
+    }
+  }
+
+  .nav-caret[data-c-header] {
+    color: var(--color-mute);
+    transition: transform var(--dur-base) var(--ease-panel);
+  }
+  .nav-item.has-menu[data-c-header]:hover .nav-caret[data-c-header],
+  .nav-item.has-menu[data-c-header]:focus-within .nav-caret[data-c-header] {
+    transform: rotate(180deg);
+  }
+
+  /* Aufklappflaeche: nicht `visibility: hidden`, sonst waere sie aus dem
+     Fokusbaum genommen und :focus-within koennte sie nie oeffnen. */.nav-panel[data-c-header] {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-6px);
+    transition:
+      opacity var(--dur-short) var(--ease-out),
+      transform var(--dur-short) var(--ease-out);
+  }
+  /* WCAG 1.4.13 („ausblendbar"): Die Flaeche muss sich schliessen lassen,
+     ohne dass der Zeiger wegbewegt werden muss — sonst verdeckt sie fuer
+     jemanden mit Bildschirmlupe dauerhaft den Inhalt darunter. Escape setzt
+     die Klasse, das Verlassen nimmt sie zurueck. Die doppelte Klasse hebt die
+     Spezifitaet ueber die Regel darunter. */.nav-item.has-menu.is-dismissed.is-dismissed[data-c-header] .nav-panel[data-c-header] {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .nav-item.has-menu[data-c-header]:hover .nav-panel[data-c-header],
+  .nav-item.has-menu[data-c-header]:focus-within .nav-panel[data-c-header] {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  .panel-link[data-c-header] {
+    text-decoration: none;
+    transition: background-color var(--dur-micro) var(--ease-micro);
+  }
+  @media (hover: hover) and (pointer: fine){
+    .panel-link[data-c-header]:hover {
+      background: var(--color-paper-2);
+    }
+  }
+  .panel-link.is-active[data-c-header] {
+    background: var(--color-accent-100);
+  }
+
+  /* Das Icon ist im Ruhezustand so leise wie der Sekundaertext und antwortet
+     erst auf den Zeiger — es soll die Liste gliedern, nicht anfuehren. Da es
+     `currentColor` traegt, genuegt der Farbwechsel am Elternelement; eine
+     zweite Icon-Fassung fuer den Hover braucht es nicht.
+
+     `:global()` auf dem Icon, weil es aus ServiceIcon.astro kommt und damit
+     dessen Bereichs-Attribut traegt, nicht das dieser Datei. Der Ausleger
+     bleibt trotzdem eng: gebunden ist die Regel an .panel-link bzw.
+     .menu-service, und die stehen beide hier. */.panel-link[data-c-header] .nav-icon {
+    /* Auf die Versalhoehe der Titelzeile, nicht auf ihre Mitte. */
+    margin-top: 0.15rem;
+    color: var(--color-mute);
+    transition: color var(--dur-micro) var(--ease-micro);
+  }
+  .panel-link.is-active[data-c-header] .nav-icon,
+  .panel-link[data-c-header]:focus-visible .nav-icon {
+    color: var(--color-accent-600);
+  }
+  @media (hover: hover) and (pointer: fine){
+    .panel-link[data-c-header]:hover .nav-icon {
+      color: var(--color-accent-600);
+    }
+  }
+
+  /* Im Burger-Menue liegt dieselbe Liste auf Tinte. Dort tragen weder das
+     Grau der Navigation noch der Vollton des Akzents genug Kontrast — es
+     gelten die dunklen Gegenstuecke derselben zwei Rollen. */
+  /* Vier Ziele direkt untereinander, dazu drei Rechtslinks in einer Zeile:
+     Beide waren mit rund 20 px zu flach fuer einen Daumen. Sie wachsen ueber
+     `padding-block` auf 44 px — und NICHT ueber ein aufgezogenes
+     Pseudo-Element, das bei zwei Zeilen in die Nachbarzeile ragen und deren
+     Klicks abfangen wuerde.
+
+     `--tap-pad` haelt den Unterstrich von `.link-slide` mit: Der sitzt am
+     unteren Rand der Polsterbox und stuende sonst zwei Zeilen tief unter
+     seinem Text. */.menu-service[data-c-header],
+.menu-legal[data-c-header] {
+    --tap-pad: 0.6rem;
+    min-height: 44px;
+    padding-block: var(--tap-pad);
+  }
+  .menu-service[data-c-header]::after,
+  .menu-legal[data-c-header]::after {
+    bottom: var(--tap-pad);
+  }
+
+  .menu-service[data-c-header] {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .menu-service[data-c-header] .nav-icon {
+    color: var(--color-mute-dark);
+    transition: color var(--dur-micro) var(--ease-micro);
+  }
+  .menu-service[data-c-header]:focus-visible .nav-icon {
+    color: var(--color-accent-400);
+  }
+  @media (hover: hover) and (pointer: fine){
+    .menu-service[data-c-header]:hover .nav-icon {
+      color: var(--color-accent-400);
+    }
+  }
+
+  /* Unterhalb von 420 px reicht die Breite nur noch fuer Logo und Burger.
+     Die Schaltflaeche verschwindet deshalb aus der Leiste — verloren geht
+     sie nicht: im Burger-Menue steht sie gross ueber den Rechtslinks.
+     Ohne diese Regel schoebe sie ab 390 px den Burger aus dem Viewport. */@media (max-width: 419px){
+    .header-cta[data-c-header] {
+      display: none;
+    }
+  }
+
+  /* Bei offenem Menue stand „Erstgespraech“ zweimal auf dem Schirm: klein in
+     der Leiste und gross am Ende des Blattes. Die Leiste raeumt auf — dort
+     bleiben Logo und Kreuz, und das Schliessen-Ziel ist damit eindeutig.
+
+     `display: none`, NICHT `opacity: 0` oder `visibility: hidden`. Ein
+     unsichtbar gemachtes Element bleibt im Layout, faengt weiter Klicks ab,
+     ist per Tabulator erreichbar und wird vorgelesen — die Nutzerin haette
+     dann einen Tabstopp auf einer Schaltflaeche, die sie nicht sieht.
+     Dieselbe Entscheidung wie beim Sprachwaehler, der bei offenem Menue
+     ebenfalls aus der Leiste faellt (LanguageSwitcher.astro). */header.menu-open .header-cta[data-c-header] {
+    display: none;
+  }
+
+  /* ------------------------------------------------------ Burger (< lg) */#mobile-menu[data-c-header] .menu-item.is-active[data-c-header] {
+    color: var(--color-accent-400);
+  }
+
+  #menu-toggle[data-c-header] {
+    color: var(--color-ink);
+    transition: color var(--dur-micro) var(--ease-micro);
+  }
+  header.menu-open #menu-toggle[data-c-header] {
+    color: var(--color-paper);
+  }
+
+  .menu-lines[data-c-header] {
+    transition: background-color var(--dur-micro) var(--ease-micro);
+  }
+  .menu-lines[data-c-header]::before,
+  .menu-lines[data-c-header]::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 2px;
+    background: currentColor;
+    transition: transform var(--dur-base) var(--ease-panel);
+  }
+  .menu-lines[data-c-header]::before {
+    transform: translateY(-6px);
+  }
+  .menu-lines[data-c-header]::after {
+    transform: translateY(6px);
+  }
+  header.menu-open .menu-lines[data-c-header] {
+    background: transparent;
+  }
+  header.menu-open .menu-lines[data-c-header]::before {
+    transform: rotate(45deg);
+  }
+  header.menu-open .menu-lines[data-c-header]::after {
+    transform: rotate(-45deg);
+  }
+
+  /* --------------------------------------------------- Geometrie des Blattes
+
+     DAS BLATT SCROLLT NICHT — SEIN INHALT SCROLLT.
+     Vorher war das Blatt selbst der Scroller und trug `pt-28` (7 rem) als
+     Polsterung. Diese Polsterung gehoerte damit zum scrollenden Inhalt: Sie
+     schob den ersten Punkt beim Oeffnen zwar unter die Leiste, wanderte beim
+     Scrollen aber mit nach oben weg — und ab da lief die ganze Liste durch
+     die Leiste hindurch.
+
+     Jetzt sind es zwei Ebenen: Das Blatt ist eine Spalte mit einer festen
+     Polsterung in Hoehe der Leiste, der scrollende Bereich liegt darunter und
+     kann seinen Anfang nicht verlassen. Die Leiste ist damit eine Wand, kein
+     Fenster.
+
+     `height` in zwei Zeilen: `dvh` ist der Viewport OHNE die ein- und
+     ausfahrende Browserleiste. `vh` misst den grossen Zustand und schnitte
+     unten genau so viel ab, wie die Leiste hoch ist — dort steht die
+     Schaltflaeche. Die erste Zeile ist der Rueckfall fuer Engines ohne dvh.
+
+     `overflow: hidden` am Blatt: Es ist ab hier kein Scroller mehr; die Regel
+     haelt zugleich jede Ueberbreite drin, damit bei offenem Menue nie
+     waagerecht gescrollt werden kann. */.menu-sheet[data-c-header] {
+    height: 100vh;
+    height: 100dvh;
+    padding-top: var(--header-h);
+    overflow: hidden;
+  }
+
+  .menu-scroll[data-c-header] {
+    flex: 1;
+    /* Ohne `min-height: 0` waechst ein Flex-Kind auf seine Inhaltshoehe und
+       scrollt nie — der bekannteste Stolperstein an dieser Konstruktion. */
+    min-height: 0;
+    overflow-y: auto;
+    /* Am Ende der Liste soll der Wisch aufhoeren und nicht auf die Seite
+       dahinter uebergehen (auch nicht als Pull-to-Refresh). */
+    overscroll-behavior: contain;
+    /* Springt der Tabulator auf einen Punkt ausserhalb des Sichtfelds, setzt
+       ihn der Browser sonst buendig an die Kante — der Fokusring (3 px Ring,
+       3 px Abstand) waere dort angeschnitten. Der Header selbst ist hier
+       nicht einzurechnen: Der Scroller faengt bereits unter ihm an. */
+    scroll-padding-block: 1rem;
+  }
+
+  /* Die Polsterung sitzt am Inhalt, nicht am Scroller: Ein `padding-bottom`
+     am Scroll-Container wird von einigen Engines am Ende des Scrollwegs
+     verschluckt — genau dort steht hier die letzte Schaltflaeche.
+
+     `min-height: 100%` haelt die alte Verteilung: Ist die Liste kuerzer als
+     das Fenster, schiebt `space-between` den unteren Block an den Fuss; ist
+     sie laenger, waechst der Inhalt und der Bereich scrollt.
+
+     Seitlich und unten kommen die Sicherheitsabstaende randloser Geraete
+     dazu. `max()` statt `+`, damit der Abstand dort, wo es keine Notch gibt,
+     exakt der alte bleibt (1.5 rem = vormals `px-6`). */.menu-inner[data-c-header] {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100%;
+    padding-top: 2.5rem;
+    padding-inline: max(1.5rem, env(safe-area-inset-left)) max(1.5rem, env(safe-area-inset-right));
+    padding-bottom: calc(2.5rem + env(safe-area-inset-bottom));
+  }
+
+  #mobile-menu[data-c-header] {
+    transition:
+      opacity var(--dur-panel-out) var(--ease-panel),
+      visibility 0s linear var(--dur-panel-out);
+  }
+  #mobile-menu.open[data-c-header] {
+    visibility: visible;
+    opacity: 1;
+    transition:
+      opacity var(--dur-panel) var(--ease-panel),
+      visibility 0s;
+  }
+  #mobile-menu[data-c-header]:focus {
+    outline: none;
+  }
+
+  .menu-item[data-c-header] {
+    opacity: 0;
+    transform: translateY(var(--move-block));
+    transition:
+      opacity var(--dur-panel-out) var(--ease-out),
+      transform var(--dur-panel-out) var(--ease-out);
+  }
+  /* Oeffnen laenger als Schliessen — dieselbe Regel wie beim FAQ-Panel. */#mobile-menu.open[data-c-header] .menu-item[data-c-header] {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity var(--dur-panel) var(--ease-out),
+      transform var(--dur-panel) var(--ease-out);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    #mobile-menu[data-c-header],
+    .menu-item[data-c-header],
+    .menu-lines[data-c-header],
+    .menu-lines[data-c-header]::before,
+    .menu-lines[data-c-header]::after,
+    .nav-panel[data-c-header],
+    .nav-caret[data-c-header],
+    .nav-link[data-c-header]::before {
+      transition: none;
+    }
+    .panel-link[data-c-header] .nav-icon,
+    .menu-service[data-c-header] .nav-icon {
+      transition: none;
+    }
+    /* Der Punkt erscheint ohne Aufziehen — die Farbe bleibt. */.nav-link[data-c-header]::before {
+      transform: none;
+    }
+    .menu-item[data-c-header] {
+      opacity: 1;
+      transform: none;
+    }
+  }

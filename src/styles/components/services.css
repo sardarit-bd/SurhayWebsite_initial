@@ -1,0 +1,27 @@
+/* Aus src/components/sections/Services.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-services] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-services="" an jedes eigene Element. */
+
+/* Die ganze Zeile ist Klickflaeche — der Titel bleibt der eigentliche Link. */.row-link[data-c-services] {
+    text-decoration: none;
+  }
+  .row-link[data-c-services]::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  /* Den Hover-Zustand traegt der Kreis (siehe global.css, Flaechen-Hover).
+     Hier bleibt nur der Pfeil: er ruecht mit, sonst nichts — kein Einruecken
+     des Textes, keine Farbwechsel am Original, die der Kreiskante
+     vorauseilen wuerden. Die Kopie im Kreis traegt dieselbe Klasse und
+     dieselbe Zustandsklasse, damit beide Pfeile deckungsgleich stehen. */.row-arrow[data-c-services] {
+    transition: transform var(--dur-short) var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine){
+    .service-row[data-c-services]:hover .row-arrow[data-c-services],
+    .service-row.is-fx-on[data-c-services] .row-arrow[data-c-services] {
+      transform: translateX(6px);
+    }
+  }

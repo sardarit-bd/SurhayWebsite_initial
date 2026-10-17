@@ -1,0 +1,36 @@
+/* Aus src/components/sections/Contact.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-contact] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-contact="" an jedes eigene Element. */
+
+/* Rahmenfarbe der Formularfelder. Stand vorher als Inline-Style im
+     Markup — der schlaegt jede Klasse, weshalb `focus:border-*` wirkungslos
+     blieb und der Fokus nur am Outline erkennbar war. */.cf-input[data-c-contact] {
+    border-color: var(--line-dark);
+    transition: border-color var(--dur-short) var(--ease-out);
+  }
+  .cf-input[data-c-contact]:focus {
+    border-color: var(--color-accent-ctx);
+  }
+
+  /* Erfolg und Fehler treten ein, statt aufzuploppen. Die Meldungen haengen
+     an `.hidden`; das Einblenden laeuft deshalb als Animation, nicht als
+     Uebergang — ein display-Wechsel hat keinen Zwischenzustand. */#form-success[data-c-contact]:not(.hidden),
+#form-error[data-c-contact]:not(.hidden) {
+    animation: cf-status-in var(--dur-short) var(--ease-out) both;
+  }
+
+  @keyframes cf-status-in{
+    from{
+      opacity: 0;
+      transform: translateY(var(--move-text));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    #form-success[data-c-contact]:not(.hidden),
+    #form-error[data-c-contact]:not(.hidden) {
+      animation: none;
+    }
+  }
