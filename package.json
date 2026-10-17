@@ -1,0 +1,38 @@
+{
+  "name": "surhay-design",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node api.js && node scripts/build-inline.mjs && node scripts/sync-case-study-routes.mjs && next dev --webpack --port 3001",
+    "build": "node api.js && node scripts/build-inline.mjs && node scripts/sync-case-study-routes.mjs && next build --webpack && node scripts/postbuild.mjs",
+    "start": "node api.js && npx serve out",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "^5.2.5",
+    "@fontsource-variable/inter": "^5.2.5",
+    "@tailwindcss/postcss": "^4.3.3",
+    "clsx": "^2.1.1",
+    "gray-matter": "^4.0.3",
+    "next": "^16.3.4",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "rehype-slug": "^6.0.0",
+    "rehype-stringify": "^10.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
+    "remark-smartypants": "^3.0.3",
+    "tailwindcss": "^4.1.11",
+    "unified": "^11.0.5",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "esbuild": "^0.28.2",
+    "typescript": "^5.9.3"
+  }
+}

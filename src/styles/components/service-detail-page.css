@@ -1,0 +1,42 @@
+/* Aus src/components/pages/ServiceDetailPage.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-service-detail-page] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-service-detail-page="" an jedes eigene Element. */
+
+/* Den Hover-Zustand traegt der Kreis (global.css, Flaechen-Hover). Die
+     Karte bleibt dabei liegen: kein Anheben, keine Skalierung, gleicher
+     Radius wie im Ruhezustand. */.other-card[data-c-service-detail-page] {
+    text-decoration: none;
+  }
+
+  /* ------------------------------------------------------ Sektionsmarke
+     Das Icon sitzt auf der Versalhoehe der Ueberschrift, nicht auf ihrer
+     Grundlinie und nicht in der Mitte der Zeilenbox. Der Unterschied ist
+     sichtbar: `align-items: center` haengte das Icon spuerbar zu tief, weil
+     die Zeilenbox unter der Grundlinie weiterlaeuft.
+
+     Rechenweg: `align-items: baseline` setzt die Unterkante des Icons auf die
+     Grundlinie. Von dort wandert es um die halbe Differenz aus Icongroesse
+     und Versalhoehe nach unten — dann liegen beide Mitten uebereinander.
+     Die Versalhoehe kennt der Browser als `1cap`; wo die Einheit fehlt, ist
+     0,72 em die Naeherung fuer Bricolage Grotesque. Deshalb traegt der
+     Container Schriftfamilie und -groesse der Ueberschrift: nur so beziehen
+     sich `cap` und `em` auf die richtige Schrift. */.section-mark[data-c-service-detail-page] {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    font-family: var(--font-display);
+    font-size: var(--text-h2-sm);
+  }
+
+  .section-mark[data-c-service-detail-page] .service-icon {
+    --cap: 0.72em;
+    transform: translateY(calc((var(--service-icon-size) - var(--cap)) / 2));
+  }
+
+  @supports (height: 1cap){
+    .section-mark[data-c-service-detail-page] .service-icon {
+      --cap: 1cap;
+    }
+  }

@@ -1,0 +1,10 @@
+/* Aus src/components/sections/Studio.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-studio] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-studio="" an jedes eigene Element. */
+
+/* Der Akzentrahmen hebt das Porträt aus der dunklen Fläche, ohne es zu
+     umranden wie ein Bilderrahmen. */.portrait[data-c-studio] {
+    box-shadow: 0 0 0 1px var(--color-accent-600);
+  }

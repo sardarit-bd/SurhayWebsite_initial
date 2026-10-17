@@ -1,0 +1,70 @@
+# Baut die Website bei jedem Push auf main und deployt sie per FTP zu Hostinger.
+#
+# Seit der Migration von Astro auf Next.js liegt das Artefakt in out/ statt in
+# dist/ (statischer Export, `output: 'export'` in next.config.mjs). Sonst ist
+# nichts anders: dasselbe `npm run build`, dieselben Secrets, dasselbe Ziel.
+#
+# Benötigte GitHub Secrets (Repo → Settings → Secrets and variables → Actions):
+#   FTP_SERVER   — z. B. ftp.surhay.design oder die IP aus dem Hostinger-Panel
+#   FTP_USERNAME — FTP-Benutzername aus dem Hostinger-Panel
+#   FTP_PASSWORD — zugehöriges Passwort
+#
+# Das Zielverzeichnis (server-dir) ggf. an euren Hostinger-Account anpassen —
+# üblich ist public_html/ im FTP-Root der Domain.
+
+name: Build & Deploy to Hostinger
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # manueller Deploy über den Actions-Tab
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site
+        # SITE_URL und BASE_PATH bleiben auf ihren Vorgaben: eigene Domain,
+        # Auslieferung im Wurzelverzeichnis (siehe next.config.mjs).
+        run: npm run build
+
+      # Ohne hinterlegte Zugangsdaten wuerde die FTP-Action mit
+      # "Input required and not supplied: server" abbrechen. Deshalb erst
+      # pruefen und den Deploy sauber ueberspringen statt rot zu laufen.
+      - name: Check FTP credentials
+        id: ftp
+        run: |
+          if [ -n "${{ secrets.FTP_SERVER }}" ] && [ -n "${{ secrets.FTP_USERNAME }}" ] && [ -n "${{ secrets.FTP_PASSWORD }}" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Hostinger-Deploy uebersprungen::Die Secrets FTP_SERVER, FTP_USERNAME und FTP_PASSWORD sind nicht gesetzt. Der Build war erfolgreich; sobald die Zugangsdaten unter Settings → Secrets and variables → Actions hinterlegt sind, laeuft der Upload automatisch mit."
+          fi
+
+      - name: Deploy via FTP
+        if: steps.ftp.outputs.ready == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: ./out/
+          server-dir: ./public_html/
+          dangerous-clean-slate: false

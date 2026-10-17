@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="de" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Surhay Design — Websites, die verkaufen | Webdesign &amp; Entwicklung Berlin</title>
+<meta name="description" content="Maßgeschneidertes Design, saubere Entwicklung, verlässliche Wartung — für KMU, Selbstständige und Startups im DACH-Raum. Webdesign-Studio aus Berlin.">
+<meta name="color-scheme" content="light">
+<script>document.documentElement.classList.replace('no-js', 'js');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================================
+   SURHAY DESIGN — „Editorial Studio“
+   Alternativentwurf der Startseite. Eine Datei, kein Framework.
+
+   AUFBAU DER DATEI
+     01  Tokens ................ Farben, Schriften, Raster, Abstände
+     02  Reset & Basis
+     03  Raster, Hilfsklassen, Sektionsköpfe
+     04  Typografie
+     05  Buttons & Links
+     06  Header, Navigation, Mobilmenü
+     07  Hero
+     08  Vertrauenszeile
+     09  Leistungen
+     10  Projekte
+     11  Prozess (einzige dunkle Sektion)
+     12  Preise
+     13  Zitat
+     14  FAQ
+     15  Abschluss-CTA
+     16  Footer
+     17  Bewegung (Scroll-Reveals, reduzierte Bewegung)
+     18  Breakpoints — 1280 / 1024 / 768 / 480
+   ========================================================================= */
+
+/* --------------------------------------------------------------- 01 Tokens */
+:root {
+  /* Farben. Gemessene Kontraste auf --paper:
+       --ink 16.9:1 · --mute 5.5:1 · --accent 5.2:1 — alle über 4.5:1.
+     --accent-light ist bewusst KEINE Textfarbe auf hellem Grund (1.6:1),
+     sondern nur Markierung, Unterstreichung und Akzent auf --dark. */
+  --paper:        #F7F5F0;
+  --paper-2:      #EDEAE3;
+  --ink:          #111111;
+  --mute:         #5F6368;
+  --logo:         #6E6D67;   /* Wortmarken der Kundenzeile, 4.76:1 auf --paper */
+  --accent:       #2E6E8E;
+  --accent-deep:  #24586F;
+  --accent-light: #7FD3EC;
+  --dark:         #14232B;
+  --dark-mute:    #A9B4BA;
+  --dark-num:     rgba(247, 245, 240, 0.45);  /* Schrittnummern, ~4:1 auf --dark */
+
+  --line:      rgba(17, 17, 17, 0.13);
+  --line-firm: rgba(17, 17, 17, 0.28);
+  --line-dark: rgba(247, 245, 240, 0.18);
+
+  /* Schriften */
+  --font-serif: 'Instrument Serif', 'Times New Roman', Georgia, serif;
+  --font-sans:  'Inter', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-mono:  'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  /* Raster: 12 Spalten, Container und Außenabstand skalieren mit dem Viewport */
+  --container: 1440px;
+  --pad: clamp(20px, 4.4vw, 64px);
+  --gap: clamp(16px, 2.2vw, 32px);
+
+  /* Vertikaler Rhythmus */
+  --section-y:  clamp(4.5rem, 8.5vw, 8.5rem);
+  --stack-sm:   clamp(0.75rem, 1.2vw, 1.25rem);
+  --stack-md:   clamp(1.5rem, 2.6vw, 2.5rem);
+  --stack-lg:   clamp(2.5rem, 4.5vw, 4.5rem);
+
+  /* Hero: Überstand des Mockups über die Hero-Unterkante */
+  --hero-pad-b: clamp(3rem, 5vw, 4.5rem);
+  --overhang:   clamp(2.5rem, 7vw, 7.5rem);
+
+  /* Bewegung */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --nav-h: 76px;
+}
+
+/* -------------------------------------------------------- 02 Reset & Basis */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.6;
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+img, svg { display: block; max-width: 100%; }
+button, input { font: inherit; color: inherit; }
+button { background: none; border: 0; cursor: pointer; }
+ul, ol { list-style: none; padding: 0; }
+a { color: inherit; text-decoration: none; }
+
+/* Ankersprünge dürfen nicht unter der klebenden Leiste landen */
+section[id], main[id] { scroll-margin-top: calc(var(--nav-h) + 8px); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+::selection { background: var(--accent-light); color: var(--ink); }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+.skip-link {
+  position: absolute; left: var(--pad); top: -100px; z-index: 200;
+  background: var(--accent); color: #fff;
+  padding: 12px 20px; border-radius: 999px;
+  font-family: var(--font-mono); font-size: 13px;
+  transition: top 0.2s var(--ease);
+}
+.skip-link:focus { top: 12px; }
+
+/* ------------------------------- 03 Raster, Hilfsklassen, Sektionsköpfe --- */
+.shell {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--pad);
+}
+
+/* Das Raster, das man spüren soll: 12 Spalten, überall dasselbe */
+.grid12 {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gap);
+}
+
+.section { padding-block: var(--section-y); }
+.section--tone { background: var(--paper-2); }
+.rule { border-top: 1px solid var(--line); }
+
+/* Sektionskopf: Haarlinie, darunter nummeriertes Mono-Eyebrow, dann Titel */
+.section-head {
+  border-top: 1px solid var(--line);
+  padding-top: 1.25rem;
+  margin-bottom: var(--stack-lg);
+  align-items: end;
+  row-gap: var(--stack-md);
+}
+.section-head__eyebrow { grid-column: 1 / 13; margin-bottom: var(--stack-md); }
+.section-head--indent .section-head__eyebrow { grid-column: 2 / 13; }
+.section-head--indent .section-head__title { grid-column: 2 / 10; }
+.section-head__title   { grid-column: 1 / 9; }
+.section-head__aside   { grid-column: 10 / 13; justify-self: start; padding-bottom: 0.4rem; }
+
+/* -------------------------------------------------------- 04 Typografie --- */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mute);
+  display: flex;
+  align-items: center;
+  gap: 0.85em;
+}
+.eyebrow__num { color: var(--accent); }
+.eyebrow__line { flex: 0 0 40px; height: 1px; background: var(--line-firm); }
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.display, h1, h2, h3 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  line-height: 1.03;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.section-title { font-size: clamp(2.1rem, 4.6vw, 3.75rem); }
+.lead {
+  font-size: clamp(1.0625rem, 1.4vw, 1.1875rem);
+  line-height: 1.6;
+  color: var(--mute);
+  max-width: 46ch;
+}
+
+/* ---------------------------------------------------- 05 Buttons & Links --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0.75rem 1.6rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  transition: background-color 0.3s var(--ease), transform 0.3s var(--ease);
+}
+.btn:hover { background: var(--accent-deep); }
+.btn:active { transform: translateY(1px); }
+.btn--sm { min-height: 44px; padding: 0.5rem 1.25rem; font-size: 14px; }
+
+/* Textlink mit Unterstreichung, die beim Hover einläuft */
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  min-height: 44px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.link__label {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: background-size 0.45s var(--ease);
+  padding-bottom: 2px;
+}
+.link:hover .link__label,
+.link:focus-visible .link__label { background-size: 100% 1px; }
+.link__arrow { transition: transform 0.45s var(--ease); }
+.link:hover .link__arrow { transform: translateX(5px); }
+
+/* Variante im Hero: dicke, helle Markierung statt feiner Linie */
+.link--marked .link__label {
+  background-image: linear-gradient(var(--accent-light), var(--accent-light));
+  background-size: 100% 3px;
+  padding-bottom: 3px;
+}
+.link--marked:hover .link__label { background-size: 100% 100%; }
+
+.link--light { color: var(--paper); }
+
+/* ----------------------------------- 06 Header, Navigation, Mobilmenü ----- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: transparent;
+  transition: background-color 0.35s var(--ease), border-color 0.35s var(--ease);
+  border-bottom: 1px solid transparent;
+}
+/* Ohne JavaScript bleibt die Leiste sonst dauerhaft transparent und Text
+   scrollt sichtbar dahinter durch — deshalb dort gleich der feste Grund. */
+.no-js .site-header {
+  background: var(--paper);
+  border-bottom-color: var(--line);
+}
+.site-header.is-scrolled {
+  background: rgba(247, 245, 240, 0.92);
+  -webkit-backdrop-filter: saturate(1.4) blur(12px);
+  backdrop-filter: saturate(1.4) blur(12px);
+  border-bottom-color: var(--line);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  min-height: var(--nav-h);
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 19px;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+  white-space: nowrap;
+  margin-right: auto;
+}
+.wordmark b { font-weight: 600; }
+.wordmark .dot { color: var(--accent); }
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 1.8vw, 1.9rem);
+}
+.nav a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 15px;
+  color: var(--mute);
+  transition: color 0.25s var(--ease);
+}
+.nav a::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 12px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s var(--ease);
+}
+.nav a:hover { color: var(--ink); }
+.nav a:hover::after { transform: scaleX(1); }
+
+.header-actions { display: flex; align-items: center; gap: clamp(0.5rem, 1.2vw, 1rem); }
+
+/* Sprachumschalter — nativ per <details>, kein zusätzliches JS */
+.lang { position: relative; }
+.lang > summary {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  min-height: 44px;
+  padding-inline: 0.5rem;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--mute);
+  transition: color 0.25s var(--ease);
+}
+.lang > summary::-webkit-details-marker { display: none; }
+.lang > summary:hover { color: var(--ink); }
+.lang__chev { transition: transform 0.3s var(--ease); }
+.lang[open] .lang__chev { transform: rotate(180deg); }
+.lang__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 108px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  padding: 6px;
+  z-index: 20;
+}
+.lang__menu a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--mute);
+}
+.lang__menu a:hover { background: var(--paper-2); color: var(--ink); }
+.lang__menu a[aria-current="true"] { color: var(--accent); }
+
+.burger {
+  display: none;
+  width: 48px; height: 48px;
+  align-items: center;
+  justify-content: center;
+  margin-right: -12px;
+}
+.burger span {
+  display: block;
+  width: 22px; height: 1px;
+  background: var(--ink);
+  position: relative;
+  transition: background-color 0.2s var(--ease);
+}
+.burger span::before, .burger span::after {
+  content: "";
+  position: absolute;
+  left: 0; width: 22px; height: 1px;
+  background: var(--ink);
+  transition: transform 0.35s var(--ease);
+}
+.burger span::before { top: -6px; }
+.burger span::after  { top: 6px; }
+body.menu-open .burger span { background: transparent; }
+body.menu-open .burger span::before { transform: translateY(6px) rotate(45deg); }
+body.menu-open .burger span::after  { transform: translateY(-6px) rotate(-45deg); }
+
+/* Vollbild-Overlay, Navigationspunkte groß in Serif */
+.mobile-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  overscroll-behavior: contain;
+  background: var(--paper);
+  padding: calc(var(--nav-h) + 2rem) var(--pad) 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: opacity 0.35s var(--ease), transform 0.35s var(--ease), visibility 0s linear 0.35s;
+  overflow-y: auto;
+}
+body.menu-open { overflow: hidden; }
+body.menu-open .mobile-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+.mobile-menu ul { display: flex; flex-direction: column; }
+.mobile-menu li { border-bottom: 1px solid var(--line); }
+.mobile-menu li a {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding-block: 0.7rem;
+  min-height: 56px;
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 9vw, 2.75rem);
+  line-height: 1.15;
+}
+.mobile-menu li a span {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+}
+.mobile-menu__foot { display: flex; flex-direction: column; gap: 1.25rem; padding-top: 2rem; }
+.mobile-menu__langs { display: flex; align-items: center; gap: 0.25rem; }
+.mobile-menu__langs a,
+.mobile-menu__langs span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 0.5rem;
+}
+.mobile-menu__langs a[aria-current="true"] { color: var(--accent); }
+
+/* -------------------------------------------------------------- 07 Hero --- */
+.hero {
+  position: relative;
+  z-index: 2;
+  padding-top: clamp(2.5rem, 6vw, 5.5rem);
+  padding-bottom: var(--hero-pad-b);
+  border-bottom: 1px solid var(--line);
+}
+.hero__grid { align-items: start; }
+
+.hero__col { grid-column: 1 / 8; }
+
+.hero__eyebrow { margin-bottom: clamp(1.75rem, 3.5vw, 3rem); }
+
+.hero__title {
+  font-size: clamp(2.75rem, 7.5vw, 6rem);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  text-wrap: pretty;
+}
+/* Jede Zeile ein eigener Block — dadurch bleibt die Zeilenzahl der Headline
+   konstant, egal wie lang das rotierende Wort ist (kein Springen des Layouts). */
+.hero__title-line { display: block; }
+.rotator {
+  display: inline-block;
+  color: var(--accent);
+  transition: opacity 0.32s var(--ease), transform 0.32s var(--ease);
+}
+/* Der Punkt steckt im Pseudo-Element, damit er mit dem Wort aus- und
+   einblendet statt 320 ms lang allein in der Zeile zu stehen. */
+.rotator::after { content: "."; color: var(--ink); }
+.rotator.is-out { opacity: 0; transform: translateY(-0.14em); }
+
+.hero__sub {
+  margin-top: clamp(1.5rem, 2.6vw, 2.25rem);
+  max-width: 44ch;
+  font-size: clamp(1.0625rem, 1.35vw, 1.1875rem);
+  color: var(--mute);
+}
+
+.hero__actions {
+  margin-top: clamp(2rem, 3.5vw, 2.75rem);
+  display: flex;
+  align-items: center;
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+  flex-wrap: wrap;
+}
+
+.hero__facts {
+  margin-top: clamp(3rem, 6vw, 5rem);
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em 0.9em;
+}
+.hero__facts li { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em; color: var(--mute); }
+.hero__facts li:not(:last-child)::after { content: " ·"; color: var(--line-firm); }
+
+/* Rechte Spalte: hochkantes Browser-Mockup, oben angehoben, unten über die
+   Sektionskante hinausgeschoben. Negative Ränder verkleinern die Rasterzelle,
+   die Zeilenhöhe kommt deshalb weiterhin aus der Textspalte links. */
+.hero__visual {
+  grid-column: 8 / 13;
+  align-self: stretch;
+  margin-top: clamp(-3.5rem, -3vw, -1.5rem);
+  margin-bottom: calc(-1 * (var(--hero-pad-b) + var(--overhang)));
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.mockup {
+  flex: 1;
+  min-height: clamp(420px, 46vw, 640px);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid var(--line-firm);
+  overflow: hidden;
+}
+.mockup__chrome {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--paper-2);
+}
+.mockup__dots { display: flex; gap: 5px; }
+.mockup__dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--line-firm); }
+.mockup__url {
+  flex: 1;
+  height: 18px;
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.06);
+}
+
+/* Abstrakte Layout-Skizze — nur Flächen und Balken, keine Fotos */
+.mockup__body {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background-image:
+    repeating-linear-gradient(to right, rgba(17,17,17,0.035) 0 1px, transparent 1px 25%);
+}
+.bar { height: 8px; border-radius: 2px; background: #E6E2DA; }
+.bar--tall { height: 15px; }
+.bar--accent { background: rgba(46, 110, 142, 0.32); }
+.bar--light { background: #F0EDE6; }
+.mockup__row { display: flex; align-items: center; gap: 8px; }
+.mockup__row .bar { flex: 1; }
+.mockup__row .bar--w2 { flex: 2; }
+.mockup__row .bar--w4 { flex: 4; }
+.mockup__pill { width: 74px; height: 22px; border-radius: 999px; background: rgba(46, 110, 142, 0.55); }
+.mockup__frame {
+  flex: 1;
+  min-height: 90px;
+  background: var(--paper-2);
+  background-image:
+    repeating-linear-gradient(45deg, rgba(17,17,17,0.045) 0 1px, transparent 1px 9px);
+}
+.mockup__cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.mockup__card {
+  border: 1px solid var(--line);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.mockup__card i { display: block; height: 34px; background: var(--paper-2); }
+.mockup__caption { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em; color: var(--mute); text-transform: uppercase; }
+
+/* --------------------------------------------- 08 Vertrauenszeile -------- */
+.trust {
+  position: relative;
+  z-index: 1;
+  padding-top: calc(var(--overhang) + clamp(2.5rem, 5vw, 4rem));
+  padding-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+.trust__grid { align-items: center; row-gap: var(--stack-md); }
+.trust__label { grid-column: 1 / 3; }
+.trust__logos {
+  grid-column: 3 / 13;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(1.25rem, 3.4vw, 3rem);
+}
+.trust__logos li {
+  font-size: clamp(0.9rem, 1.15vw, 1rem);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--logo);
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------- 09 Leistungen */
+.services__list { border-top: 1px solid var(--line-firm); }
+.service {
+  border-bottom: 1px solid var(--line);
+  transition: background-color 0.4s var(--ease);
+}
+.service__link {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gap);
+  align-items: baseline;
+  padding-block: clamp(1.5rem, 3vw, 2.5rem);
+  transition: transform 0.45s var(--ease);
+}
+.service:hover { background: rgba(17, 17, 17, 0.017); }
+.service:hover .service__link,
+.service__link:focus-visible { transform: translateX(clamp(6px, 1vw, 14px)); }
+
+.service__num {
+  grid-column: 1 / 2;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  color: var(--mute);
+  transition: color 0.35s var(--ease);
+}
+.service:hover .service__num { color: var(--accent); }
+.service__name { grid-column: 2 / 6; font-size: clamp(1.6rem, 2.8vw, 2.4rem); }
+.service__desc { grid-column: 6 / 11; color: var(--mute); font-size: 1.0625rem; }
+.service__more { grid-column: 11 / 13; justify-self: end; }
+
+/* ------------------------------------------------------------ 10 Projekte */
+/* Versetztes Raster: die rechte Spalte startet 120 px tiefer. Der negative
+   Unterrand hebt den Versatz für die Zeilenberechnung wieder auf, damit die
+   zweite Reihe nicht auseinanderfällt. */
+.work__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: var(--gap);
+  row-gap: clamp(2.5rem, 5vw, 4.5rem);
+  align-items: start;
+  padding-bottom: 120px;
+}
+.work__item:nth-child(even) { margin-top: 120px; margin-bottom: -120px; }
+
+.work__item > a { display: block; }
+.work__media {
+  aspect-ratio: 4 / 3;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  padding: clamp(14px, 2vw, 26px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+  transition: border-color 0.4s var(--ease);
+}
+.section--tone .work__media { background: #F4F2ED; }
+.work__item a:hover .work__media { border-color: var(--line-firm); }
+.work__sketch { flex: 1; display: flex; flex-direction: column; gap: 9px; }
+.work__sketch .bar { background: #E2DED5; }
+.section--tone .work__sketch .bar { background: #E4E0D7; }
+.work__sketch .bar--light { background: #EFECE4; }
+.section--tone .work__sketch .bar--light { background: #EDE9E1; }
+.work__block {
+  flex: 1;
+  background: var(--paper-2);
+  background-image: repeating-linear-gradient(45deg, rgba(17,17,17,0.04) 0 1px, transparent 1px 9px);
+  transition: transform 0.6s var(--ease);
+}
+.work__item a:hover .work__block { transform: scale(1.015); }
+
+.work__title {
+  margin-top: clamp(1rem, 1.8vw, 1.5rem);
+  font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+}
+.work__meta { margin-top: 0.4rem; }
+
+/* --------------------------------------- 11 Prozess (dunkle Sektion) ----- */
+.process {
+  background: var(--dark);
+  color: var(--paper);
+}
+.process .section-head { border-top-color: var(--line-dark); }
+.process .eyebrow { color: var(--dark-mute); }
+.process .eyebrow__num { color: var(--accent-light); }
+.process .eyebrow__line { background: var(--line-dark); }
+.process .lead { color: var(--dark-mute); }
+/* Der Vorspann braucht mehr Mass als die dreispaltige Mono-Notiz der anderen
+   Sektionsköpfe — sonst steht Fliesstext in einer 250-px-Rinne. */
+.process .section-head__aside { grid-column: 9 / 13; }
+
+.process__list {
+  border-top: 1px solid var(--line-dark);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: var(--gap);
+}
+.process__step { position: relative; padding-top: clamp(1.75rem, 3vw, 2.75rem); padding-right: 1rem; }
+.process__step::before {
+  content: "";
+  position: absolute;
+  top: -4px; left: 0;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent-light);
+}
+.process__num {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: clamp(2.75rem, 5vw, 4rem);
+  line-height: 1;
+  color: var(--dark-num);
+  margin-bottom: 0.75rem;
+}
+.process__title { font-size: clamp(1.35rem, 2vw, 1.75rem); margin-bottom: 0.6rem; }
+.process__desc { color: var(--dark-mute); font-size: 1.0625rem; max-width: 30ch; }
+.process__meta {
+  display: block;
+  margin-top: 1rem;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-light);
+}
+
+/* --------------------------------------------------------------- 12 Preise */
+.pricing__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* eine Rasterspalte plus Rinne bleibt rechts frei */
+  margin-right: calc((100% - 11 * var(--gap)) / 12 + var(--gap));
+}
+.pricing__col {
+  display: flex;
+  flex-direction: column;
+  padding-right: clamp(1.25rem, 2.5vw, 2.5rem);
+}
+.pricing__col + .pricing__col {
+  border-left: 1px solid var(--line);
+  padding-left: clamp(1.25rem, 2.5vw, 2.5rem);
+}
+.pricing__name { font-size: clamp(1.5rem, 2.4vw, 2rem); }
+.pricing__price {
+  margin-top: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+.pricing__price b { font-weight: 500; }
+.pricing__features { margin-top: clamp(1.25rem, 2vw, 1.75rem); display: flex; flex-direction: column; gap: 0.65rem; }
+.pricing__features li {
+  position: relative;
+  padding-left: 1.1rem;
+  font-size: 1.0625rem;
+  color: var(--mute);
+}
+.pricing__features li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0.72em;
+  width: 6px; height: 1px;
+  background: var(--accent);
+}
+.pricing__more { margin-top: auto; padding-top: clamp(1.25rem, 2vw, 1.75rem); align-self: start; }
+.pricing__note { margin-top: var(--stack-lg); padding-top: 1rem; border-top: 1px solid var(--line); }
+
+/* ---------------------------------------------------------------- 13 Zitat */
+.quote__grid { row-gap: var(--stack-md); }
+.quote__text {
+  grid-column: 4 / 13;
+  font-family: var(--font-serif);
+  font-size: clamp(1.9rem, 4.2vw, 3.4rem);
+  line-height: 1.12;
+  letter-spacing: -0.018em;
+  text-indent: -0.42em;
+}
+.quote__attr { grid-column: 4 / 10; display: flex; flex-direction: column; gap: 0.25rem; }
+.quote__attr b { font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); }
+
+/* ------------------------------------------------------------------ 14 FAQ */
+.faq__list { border-top: 1px solid var(--line-firm); }
+.faq__item { border-bottom: 1px solid var(--line); }
+.faq__q {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  text-align: left;
+  padding-block: clamp(1.1rem, 2vw, 1.6rem);
+  min-height: 56px;
+  font-family: var(--font-sans);
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.4;
+  transition: color 0.3s var(--ease);
+}
+.faq__q:hover { color: var(--accent); }
+.faq__icon { position: relative; flex: none; width: 16px; height: 16px; }
+.faq__icon::before, .faq__icon::after {
+  content: "";
+  position: absolute;
+  inset: 50% 0 auto 0;
+  height: 1px;
+  background: currentColor;
+  transition: transform 0.4s var(--ease);
+}
+.faq__icon::after { transform: rotate(90deg); }
+.faq__item.is-open .faq__icon::after { transform: rotate(0deg); }
+.faq__item.is-open .faq__q { color: var(--accent); }
+
+.faq__panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.4s var(--ease); }
+.faq__panel > div {
+  overflow: hidden;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s var(--ease), visibility 0s linear 0.4s;
+}
+.faq__item.is-open .faq__panel { grid-template-rows: 1fr; }
+.faq__item.is-open .faq__panel > div {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.4s var(--ease) 0.08s, visibility 0s linear 0s;
+}
+.faq__panel p {
+  padding-bottom: clamp(1.25rem, 2vw, 1.75rem);
+  margin-left: calc((100% - 11 * var(--gap)) / 12 + var(--gap));
+  max-width: 58ch;
+  color: var(--mute);
+  font-size: 1.0625rem;
+}
+
+/* -------------------------------------------------------- 15 Abschluss-CTA */
+.cta { border-top: 1px solid var(--line); }
+.cta__title { grid-column: 1 / 10; font-size: clamp(2.2rem, 5.6vw, 4.5rem); }
+.cta__actions {
+  grid-column: 1 / 10;
+  margin-top: clamp(2rem, 3.5vw, 3rem);
+  display: flex;
+  align-items: center;
+  gap: clamp(1.25rem, 2.5vw, 2.25rem);
+  flex-wrap: wrap;
+}
+
+/* ----------------------------------------------------------------- 16 Footer */
+.footer { border-top: 1px solid var(--line); padding-block: clamp(3rem, 6vw, 5rem) 2rem; }
+.footer__grid { row-gap: var(--stack-lg); }
+.footer__brand { grid-column: 1 / 5; }
+.footer__brand p { margin-top: 1rem; color: var(--mute); font-size: 15px; max-width: 32ch; }
+.footer__col { grid-column: span 2; }
+.footer__col:nth-of-type(2) { grid-column: 6 / 8; }
+.footer__col:nth-of-type(3) { grid-column: 8 / 10; }
+.footer__col:nth-of-type(4) { grid-column: 10 / 13; }
+.footer__col h2 { font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mute); margin-bottom: 1.1rem; }
+.footer__col li a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 15px;
+}
+.footer__col p {
+  display: block;
+  padding-block: 0.55rem;
+  font-size: 15px;
+}
+.footer__col li a { color: var(--mute); transition: color 0.25s var(--ease); }
+.footer__col li a:hover { color: var(--ink); }
+.footer__col p { color: var(--mute); }
+
+.footer__bottom {
+  margin-top: clamp(3rem, 6vw, 5rem);
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  flex-wrap: wrap;
+}
+
+/* ------------------------------------------------------------ 17 Bewegung */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+  transition-delay: var(--delay, 0ms);
+}
+.js [data-reveal].is-visible { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .js [data-reveal] { opacity: 1; transform: none; transition: none; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+  }
+}
+
+/* ----------------------------------------------------------- 18 Breakpoints */
+
+/* — 1379 px und schmaler: die Textspalte waechst auf 8, das Visual auf 4
+     Spalten. Grund: bei 96 px Schriftgrad passt "Websites, die verkaufen."
+     unterhalb von 1440 px nicht mehr in sieben Spalten — die Headline waere
+     sonst vierzeilig. Die Asymmetrie bleibt, nur das Verhaeltnis kippt.
+     Wer lieber 7/5 behaelt, loescht diesen Block und lebt mit vier Zeilen. --- */
+@media (max-width: 1379px) and (min-width: 1024.02px) {
+  .hero__col { grid-column: 1 / 9; }
+  /* Vier statt fuenf Spalten: das Mockup wird an die Unterkante gehaengt und
+     bekommt ein festes Hochformat, sonst zieht es sich zu einem Streifen. */
+  .hero__visual { grid-column: 9 / 13; align-self: end; margin-top: 0; }
+  .mockup { flex: 0 0 auto; min-height: 0; aspect-ratio: 4 / 5.6; }
+}
+
+/* — 1280 px: Raster etwas enger, Mockup weniger hoch ---------------------- */
+@media (max-width: 1280px) {
+  :root { --gap: 24px; }
+  .service__name { grid-column: 2 / 7; }
+  .service__desc { grid-column: 7 / 11; }
+  .mockup { min-height: 400px; }
+  .trust__logos { gap: clamp(1rem, 2.4vw, 2rem); }
+}
+
+/* — 1024 px: Hero einspaltig, Mockup rutscht unter den Text --------------- */
+@media (max-width: 1024px) {
+  .nav, .header-actions .btn { display: none; }
+  .burger { display: inline-flex; }
+
+  .hero__col, .hero__visual { grid-column: 1 / 13; }
+  .hero__visual {
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+    margin-bottom: calc(-1 * (var(--hero-pad-b) + var(--overhang)));
+    max-width: 460px;
+  }
+  .mockup { min-height: 0; aspect-ratio: 3 / 4; }
+
+  .section-head__title { grid-column: 1 / 11; }
+  .section-head__aside { grid-column: 1 / 13; padding-bottom: 0; }
+
+  .trust__label { grid-column: 1 / 13; }
+  .trust__logos { grid-column: 1 / 13; }
+
+  .service__link { grid-template-columns: repeat(8, minmax(0, 1fr)); row-gap: 0.5rem; }
+  .service__num  { grid-column: 1 / 2; grid-row: 1; }
+  .service__name { grid-column: 2 / 9; grid-row: 1; }
+  .service__desc { grid-column: 2 / 8; grid-row: 2; }
+  .service__more { grid-column: 2 / 9; grid-row: 3; justify-self: start; }
+
+  .process__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: clamp(2rem, 4vw, 3rem);
+    border-top: 0;
+  }
+  .process__step { border-top: 1px solid var(--line-dark); }
+
+  .quote__text { grid-column: 2 / 13; }
+  .quote__attr { grid-column: 2 / 13; }
+  .pricing__grid { margin-right: 0; }
+  .section-head--indent .section-head__eyebrow,
+  .section-head--indent .section-head__title { grid-column: 1 / 11; }
+
+  .cta__title, .cta__actions { grid-column: 1 / 13; }
+
+  .footer__brand { grid-column: 1 / 13; }
+  .footer__col:nth-of-type(2) { grid-column: 1 / 5; }
+  .footer__col:nth-of-type(3) { grid-column: 5 / 9; }
+  .footer__col:nth-of-type(4) { grid-column: 9 / 13; }
+}
+
+/* — 768 px: Projektraster einspaltig, Timeline vertikal ------------------- */
+@media (max-width: 768px) {
+  body { font-size: 16px; }
+
+  .work__grid { grid-template-columns: 1fr; padding-bottom: 0; row-gap: clamp(2.5rem, 7vw, 3.5rem); }
+  .work__item:nth-child(even) { margin-top: 0; margin-bottom: 0; }
+
+  .process__list {
+    grid-template-columns: 1fr;
+    border-top: 0;
+    border-left: 1px solid var(--line-dark);
+    row-gap: 0;
+  }
+  .process__step {
+    border-top: 0;
+    padding-top: 0;
+    padding-left: clamp(1.5rem, 5vw, 2.25rem);
+    padding-bottom: clamp(2rem, 5vw, 2.75rem);
+  }
+  .process__step:last-child { padding-bottom: 0; }
+  .process__step::before { top: 0.55rem; left: -4px; }
+  .process__num { font-size: 2.5rem; margin-bottom: 0.35rem; }
+  .process__desc { max-width: 42ch; }
+
+  .pricing__grid { grid-template-columns: 1fr; }
+  .pricing__col { padding-right: 0; padding-bottom: clamp(2rem, 5vw, 2.5rem); }
+  .pricing__col + .pricing__col {
+    border-left: 0;
+    padding-left: 0;
+    border-top: 1px solid var(--line);
+    padding-top: clamp(2rem, 5vw, 2.5rem);
+  }
+
+  .footer__col:nth-of-type(2), .footer__col:nth-of-type(3) { grid-column: span 6; }
+  .footer__col:nth-of-type(4) { grid-column: 1 / 13; }
+}
+
+/* — 480 px: kompakteste Stufe -------------------------------------------- */
+@media (max-width: 480px) {
+  :root { --gap: 16px; --nav-h: 66px; }
+  .hero__title { letter-spacing: -0.02em; }
+  .hero__actions { align-items: stretch; flex-direction: column; }
+  .hero__actions .btn { width: 100%; }
+  .hero__visual { max-width: none; }
+  .trust__logos { gap: 0.75rem 1.5rem; }
+  .service__num { grid-column: 1 / 9; }
+  .service__name, .service__desc, .service__more { grid-column: 1 / 9; }
+  .service__num { grid-row: 1; }
+  .service__name { grid-row: 2; }
+  .service__desc { grid-row: 3; }
+  .service__more { grid-row: 4; }
+  .quote__text { text-indent: 0; grid-column: 1 / 13; }
+  .quote__attr { grid-column: 1 / 13; }
+  .faq__panel p { margin-left: 0; }
+  .footer__col:nth-of-type(2), .footer__col:nth-of-type(3) { grid-column: 1 / 13; }
+  .footer__bottom { flex-direction: column; gap: 0.5rem; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+<!-- ============================================================ 06 HEADER -->
+<header class="site-header" id="siteHeader">
+  <div class="shell header-inner">
+    <a class="wordmark" href="#top" aria-label="Surhay Design — zur Startseite"><b>Surhay</b><span class="dot">.</span>Design</a>
+
+    <nav class="nav" aria-label="Hauptnavigation">
+      <a href="#leistungen">Leistungen</a>
+      <a href="#projekte">Projekte</a>
+      <a href="#prozess">Prozess</a>
+      <a href="#preise">Preise</a>
+      <a href="#faq">FAQ</a>
+      <a href="/blog/">Blog</a>
+    </nav>
+
+    <div class="header-actions">
+      <details class="lang">
+        <summary><span class="sr-only">Sprache wählen: </span>DE <span class="lang__chev" aria-hidden="true">⌄</span></summary>
+        <div class="lang__menu">
+          <a href="#" aria-current="true">DE</a>
+          <a href="/en/">EN</a>
+          <a href="/tr/">TR</a>
+        </div>
+      </details>
+      <a class="btn btn--sm" href="#kontakt">Erstgespräch</a>
+      <button class="burger" id="burger" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="mobileMenu">
+        <span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Vollbild-Overlay für Mobil -->
+<div class="mobile-menu" id="mobileMenu">
+  <nav aria-label="Navigation (mobil)">
+    <ul>
+      <li><a href="#leistungen"><span>01</span>Leistungen</a></li>
+      <li><a href="#projekte"><span>02</span>Projekte</a></li>
+      <li><a href="#prozess"><span>03</span>Prozess</a></li>
+      <li><a href="#preise"><span>04</span>Preise</a></li>
+      <li><a href="#faq"><span>05</span>FAQ</a></li>
+      <li><a href="/blog/"><span>06</span>Blog</a></li>
+    </ul>
+  </nav>
+  <div class="mobile-menu__foot">
+    <a class="btn" href="#kontakt">Kostenloses Erstgespräch</a>
+    <p class="mono mobile-menu__langs"><a href="#" aria-current="true">DE</a><span aria-hidden="true">·</span><a href="/en/">EN</a><span aria-hidden="true">·</span><a href="/tr/">TR</a></p>
+  </div>
+</div>
+
+<main id="main" tabindex="-1">
+
+  <!-- =========================================================== 07 HERO -->
+  <section class="hero" id="top">
+    <div class="shell grid12 hero__grid">
+
+      <div class="hero__col">
+        <p class="eyebrow hero__eyebrow"><span class="eyebrow__line" aria-hidden="true"></span>Webdesign · Entwicklung · Wartung — Berlin</p>
+
+        <h1 class="hero__title">
+          <span class="hero__title-line">Websites, die verkaufen.</span>
+          <span class="hero__title-line" aria-hidden="true">Gebaut für</span>
+          <span class="hero__title-line" aria-hidden="true"><span class="rotator" id="rotator">Steuerberater</span></span>
+          <span class="sr-only">Gebaut für Steuerberater, Rechtsanwälte, Zahnärzte, Handwerksbetriebe, Immobilienmakler und Praxen.</span>
+        </h1>
+
+        <p class="hero__sub">Maßgeschneidertes Design, saubere Entwicklung, verlässliche Wartung — für KMU, Selbstständige und Startups im DACH-Raum.</p>
+
+        <div class="hero__actions">
+          <a class="btn" href="#kontakt">Kostenloses Erstgespräch</a>
+          <a class="link link--marked" href="#projekte"><span class="link__label">Projekte ansehen</span><span class="link__arrow" aria-hidden="true">→</span></a>
+        </div>
+
+        <ul class="hero__facts">
+          <li>Seit 2019</li>
+          <li>Berlin</li>
+          <li>40+ Projekte</li>
+          <li>Antwort innerhalb von 24&nbsp;h</li>
+        </ul>
+      </div>
+
+      <!-- Browser-Mockup: rein abstrakte Layout-Skizze, keine Fotos -->
+      <div class="hero__visual">
+        <div class="mockup" aria-hidden="true">
+          <div class="mockup__chrome">
+            <div class="mockup__dots"><i></i><i></i><i></i></div>
+            <div class="mockup__url"></div>
+          </div>
+          <div class="mockup__body">
+            <div class="mockup__row">
+              <span class="bar bar--w2" style="max-width:64px"></span>
+              <span class="bar bar--light"></span>
+              <span class="bar bar--light"></span>
+              <span class="bar bar--light"></span>
+            </div>
+            <div style="height:10px"></div>
+            <span class="bar bar--tall" style="width:88%"></span>
+            <span class="bar bar--tall" style="width:64%"></span>
+            <span class="bar" style="width:74%"></span>
+            <span class="bar bar--light" style="width:56%"></span>
+            <div class="mockup__pill"></div>
+            <div class="mockup__frame"></div>
+            <div class="mockup__cards">
+              <div class="mockup__card"><i></i><span class="bar" style="width:70%"></span><span class="bar bar--light"></span></div>
+              <div class="mockup__card"><i></i><span class="bar bar--accent" style="width:70%"></span><span class="bar bar--light"></span></div>
+            </div>
+            <div class="mockup__row">
+              <span class="bar bar--light bar--w4"></span>
+              <span class="bar bar--light"></span>
+            </div>
+          </div>
+        </div>
+        <p class="mockup__caption">Auszug — Weber &amp; Partner, Relaunch 2025</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================================================ 08 VERTRAUENSZEILE -->
+  <section class="trust" aria-label="Ausgewählte Kunden">
+    <div class="shell grid12 trust__grid">
+      <p class="mono trust__label">Ausgewählte Kunden</p>
+      <ul class="trust__logos">
+        <li>Bergmann Kaffeerösterei</li>
+        <li>Weber &amp; Partner</li>
+        <li>Studio Lichtblick</li>
+        <li>Praxis Nordlicht</li>
+        <li>Elektro Krüger</li>
+        <li>Nowak Immobilien</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===================================================== 09 LEISTUNGEN -->
+  <section class="section" id="leistungen">
+    <div class="shell">
+      <div class="grid12 section-head" data-reveal>
+        <p class="eyebrow section-head__eyebrow"><span class="eyebrow__num">01</span> Leistungen</p>
+        <h2 class="section-title section-head__title">Drei Dinge, die wir<br>richtig gut können.</h2>
+        <p class="mono section-head__aside">Kein Bauchladen.<br>Dafür Tiefe.</p>
+      </div>
+
+      <ol class="services__list">
+        <li class="service" data-reveal>
+          <a class="service__link" href="#kontakt">
+            <span class="service__num">01</span>
+            <h3 class="service__name">Webdesign</h3>
+            <p class="service__desc">Klare Struktur, starke Typografie, überzeugende Nutzerführung — individuell entworfen statt aus dem Baukasten.</p>
+            <span class="link service__more"><span class="link__label">Mehr</span><span class="link__arrow" aria-hidden="true">→</span></span>
+          </a>
+        </li>
+        <li class="service" data-reveal>
+          <a class="service__link" href="#kontakt">
+            <span class="service__num">02</span>
+            <h3 class="service__name">Entwicklung</h3>
+            <p class="service__desc">Schnell, barrierearm, wartbar. Framer, Webflow, WordPress oder Custom Code — je nachdem, was Ihr Projekt wirklich braucht.</p>
+            <span class="link service__more"><span class="link__label">Mehr</span><span class="link__arrow" aria-hidden="true">→</span></span>
+          </a>
+        </li>
+        <li class="service" data-reveal>
+          <a class="service__link" href="#kontakt">
+            <span class="service__num">03</span>
+            <h3 class="service__name">Wartung</h3>
+            <p class="service__desc">Updates, Backups, Monitoring und kleine Änderungen — monatlich, planbar.</p>
+            <span class="link service__more"><span class="link__label">Mehr</span><span class="link__arrow" aria-hidden="true">→</span></span>
+          </a>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ======================================================= 10 PROJEKTE -->
+  <section class="section section--tone" id="projekte">
+    <div class="shell">
+      <div class="grid12 section-head section-head--indent" data-reveal>
+        <p class="eyebrow section-head__eyebrow"><span class="eyebrow__num">02</span> Projekte</p>
+        <h2 class="section-title section-head__title">Ausgewählte Arbeiten</h2>
+        <a class="link section-head__aside" href="#kontakt"><span class="link__label">Alle Projekte</span><span class="link__arrow" aria-hidden="true">→</span></a>
+      </div>
+
+      <div class="work__grid">
+
+        <article class="work__item" data-reveal>
+          <a href="#kontakt">
+            <div class="work__media">
+              <div class="work__sketch">
+                <span class="bar" style="width:38%"></span>
+                <span class="bar bar--tall" style="width:82%"></span>
+                <div class="work__block"></div>
+                <span class="bar" style="width:60%"></span>
+              </div>
+            </div>
+            <h3 class="work__title">Weber &amp; Partner Rechtsanwälte</h3>
+            <p class="mono work__meta">Kanzlei · Webdesign, Entwicklung</p>
+          </a>
+        </article>
+
+        <article class="work__item" data-reveal>
+          <a href="#kontakt">
+            <div class="work__media">
+              <div class="work__sketch">
+                <div class="work__block"></div>
+                <span class="bar bar--tall" style="width:70%"></span>
+                <span class="bar" style="width:45%"></span>
+              </div>
+            </div>
+            <h3 class="work__title">Bergmann Kaffeerösterei</h3>
+            <p class="mono work__meta">E-Commerce · Webdesign, Shop, Wartung</p>
+          </a>
+        </article>
+
+        <article class="work__item" data-reveal>
+          <a href="#kontakt">
+            <div class="work__media">
+              <div class="work__sketch">
+                <span class="bar" style="width:52%"></span>
+                <div class="work__block"></div>
+                <span class="bar" style="width:88%"></span>
+                <span class="bar bar--light" style="width:66%"></span>
+              </div>
+            </div>
+            <h3 class="work__title">Studio Lichtblick</h3>
+            <p class="mono work__meta">Fotografie · Portfolio, Online-Buchung</p>
+          </a>
+        </article>
+
+        <article class="work__item" data-reveal>
+          <a href="#kontakt">
+            <div class="work__media">
+              <div class="work__sketch">
+                <span class="bar bar--tall" style="width:76%"></span>
+                <span class="bar" style="width:50%"></span>
+                <div class="work__block"></div>
+              </div>
+            </div>
+            <h3 class="work__title">Praxis am Kollwitzplatz</h3>
+            <p class="mono work__meta">Zahnmedizin · Webdesign, Terminbuchung</p>
+          </a>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================== 11 PROZESS — einzige dunkle Sektion -->
+  <section class="section process" id="prozess">
+    <div class="shell">
+      <div class="grid12 section-head" data-reveal>
+        <p class="eyebrow section-head__eyebrow"><span class="eyebrow__num">03</span> Prozess</p>
+        <h2 class="section-title section-head__title">So arbeiten wir.</h2>
+        <p class="lead section-head__aside">Transparent und planbar. Sie wissen jederzeit, wo Ihr Projekt steht.</p>
+      </div>
+
+      <ol class="process__list">
+        <li class="process__step" data-reveal style="--delay:0ms">
+          <span class="process__num">01</span>
+          <h3 class="process__title">Erstgespräch</h3>
+          <p class="process__desc">30 Minuten. Wir hören zu.</p>
+          <span class="process__meta">30 Min.</span>
+        </li>
+        <li class="process__step" data-reveal style="--delay:90ms">
+          <span class="process__num">02</span>
+          <h3 class="process__title">Konzept &amp; Design</h3>
+          <p class="process__desc">Struktur, Texte, Layout. Ein Entwurf, der sitzt.</p>
+          <span class="process__meta">1–2 Wochen</span>
+        </li>
+        <li class="process__step" data-reveal style="--delay:180ms">
+          <span class="process__num">03</span>
+          <h3 class="process__title">Entwicklung</h3>
+          <p class="process__desc">Sauber gebaut, getestet, übergeben.</p>
+          <span class="process__meta">2–4 Wochen</span>
+        </li>
+        <li class="process__step" data-reveal style="--delay:270ms">
+          <span class="process__num">04</span>
+          <h3 class="process__title">Wartung</h3>
+          <p class="process__desc">Wir bleiben dran, damit die Seite weiter verkauft.</p>
+          <span class="process__meta">fortlaufend</span>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ========================================================= 12 PREISE -->
+  <section class="section" id="preise">
+    <div class="shell">
+      <div class="grid12 section-head" data-reveal>
+        <p class="eyebrow section-head__eyebrow"><span class="eyebrow__num">04</span> Preise</p>
+        <h2 class="section-title section-head__title">Klare Rahmen,<br>keine Überraschungen.</h2>
+        <p class="mono section-head__aside">Festpreis nach<br>dem Erstgespräch.</p>
+      </div>
+
+      <div class="pricing__grid" data-reveal>
+        <div class="pricing__col">
+          <h3 class="pricing__name">Starter</h3>
+          <p class="pricing__price">ab <b>2.900&nbsp;€</b></p>
+          <ul class="pricing__features">
+            <li>OnePager mit bis zu 6 Sektionen</li>
+            <li>Individuelles Design, kein Template</li>
+            <li>SEO-Grundsetup, live in 3–4 Wochen</li>
+          </ul>
+          <a class="link pricing__more" href="#kontakt"><span class="link__label">Details</span><span class="link__arrow" aria-hidden="true">→</span></a>
+        </div>
+
+        <div class="pricing__col">
+          <h3 class="pricing__name">Business</h3>
+          <p class="pricing__price">ab <b>5.900&nbsp;€</b></p>
+          <ul class="pricing__features">
+            <li>Bis 8 Unterseiten mit eigenem CMS</li>
+            <li>Blog, Case Studies, DE/EN/TR</li>
+            <li>Performance-Garantie 95+, live in 5–7 Wochen</li>
+          </ul>
+          <a class="link pricing__more" href="#kontakt"><span class="link__label">Details</span><span class="link__arrow" aria-hidden="true">→</span></a>
+        </div>
+
+        <div class="pricing__col">
+          <h3 class="pricing__name">Custom</h3>
+          <p class="pricing__price">auf Anfrage</p>
+          <ul class="pricing__features">
+            <li>Shop, Buchung, Schnittstellen</li>
+            <li>Workshops, Strategie, Redesign</li>
+            <li>Umfang und Zeitplan nach Bedarf</li>
+          </ul>
+          <a class="link pricing__more" href="#kontakt"><span class="link__label">Details</span><span class="link__arrow" aria-hidden="true">→</span></a>
+        </div>
+      </div>
+
+      <p class="mono pricing__note">Wartung ab 89&nbsp;€/Monat · monatlich kündbar</p>
+    </div>
+  </section>
+
+  <!-- ========================================================== 13 ZITAT -->
+  <section class="section section--tone" aria-label="Kundenstimme">
+    <div class="shell grid12 quote__grid">
+      <blockquote class="quote__text" data-reveal>„Surhay hat verstanden, was wir brauchen, bevor wir es selbst formulieren konnten. Die neue Website hat unseren Online-Umsatz mehr als verdoppelt — und wir pflegen sie komplett selbst.“</blockquote>
+      <p class="quote__attr" data-reveal>
+        <b>Lena Bergmann</b>
+        <span class="mono">Bergmann Kaffeerösterei, Berlin</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================================ 14 FAQ -->
+  <section class="section" id="faq">
+    <div class="shell">
+      <div class="grid12 section-head" data-reveal>
+        <p class="eyebrow section-head__eyebrow"><span class="eyebrow__num">05</span> FAQ</p>
+        <h2 class="section-title section-head__title">Häufige Fragen,<br>ehrliche Antworten.</h2>
+      </div>
+
+      <div class="faq__list" data-reveal>
+
+        <div class="faq__item">
+          <h3><button class="faq__q" type="button" id="faq-q-1" aria-expanded="false" aria-controls="faq-p-1">Was kostet eine Website bei euch?<span class="faq__icon" aria-hidden="true"></span></button></h3>
+          <div class="faq__panel"><div id="faq-p-1" role="region" aria-labelledby="faq-q-1"><p>OnePager starten ab 2.900&nbsp;€, mehrseitige Business-Websites ab 5.900&nbsp;€. Der genaue Preis hängt vom Umfang ab — nach dem kostenlosen Erstgespräch erhalten Sie ein Festpreis-Angebot ohne versteckte Kosten. Was im Angebot steht, gilt.</p></div></div>
+        </div>
+
+        <div class="faq__item">
+          <h3><button class="faq__q" type="button" id="faq-q-2" aria-expanded="false" aria-controls="faq-p-2">Wie lange dauert ein Website-Projekt?<span class="faq__icon" aria-hidden="true"></span></button></h3>
+          <div class="faq__panel"><div id="faq-p-2" role="region" aria-labelledby="faq-q-2"><p>Ein OnePager ist in der Regel nach 3–4 Wochen live, eine mehrseitige Website nach 5–7 Wochen. Der häufigste Verzögerungsgrund sind übrigens fehlende Inhalte — deshalb klären wir Texte und Bilder gleich zu Projektbeginn.</p></div></div>
+        </div>
+
+        <div class="faq__item">
+          <h3><button class="faq__q" type="button" id="faq-q-3" aria-expanded="false" aria-controls="faq-p-3">Kann ich Inhalte später selbst ändern?<span class="faq__icon" aria-hidden="true"></span></button></h3>
+          <div class="faq__panel"><div id="faq-p-3" role="region" aria-labelledby="faq-q-3"><p>Ja — das ist fester Bestandteil jedes Projekts. Sie bekommen ein schlankes CMS, mit dem Sie Texte, Bilder, Blog-Artikel und Projekte selbst pflegen können, ohne Technikkenntnisse. Zum Abschluss gibt es eine persönliche Einweisung.</p></div></div>
+        </div>
+
+        <div class="faq__item">
+          <h3><button class="faq__q" type="button" id="faq-q-4" aria-expanded="false" aria-controls="faq-p-4">Brauche ich wirklich ein Wartungspaket?<span class="faq__icon" aria-hidden="true"></span></button></h3>
+          <div class="faq__panel"><div id="faq-p-4" role="region" aria-labelledby="faq-q-4"><p>Verpflichtend ist es nicht. Aber: Auch die beste Website braucht Updates, Backups und ein wachsames Auge — sonst wird sie mit der Zeit langsam, unsicher oder fällt aus. Mit einem Wartungspaket ist das abgedeckt, monatlich kündbar. Alternativ übergeben wir Ihnen die Website komplett, ohne Agentur-Bindung.</p></div></div>
+        </div>
+
+        <div class="faq__item">
+          <h3><button class="faq__q" type="button" id="faq-q-5" aria-expanded="false" aria-controls="faq-p-5">Wie läuft die Zusammenarbeit ab — muss ich nach Berlin kommen?<span class="faq__icon" aria-hidden="true"></span></button></h3>
+          <div class="faq__panel"><div id="faq-p-5" role="region" aria-labelledby="faq-q-5"><p>Nein. Die meisten Projekte laufen komplett remote: Videocalls für die wichtigen Meilensteine, dazwischen kurze Abstimmungen per E-Mail. Wer in Berlin ist, trifft uns aber auch gern persönlich — der Espresso geht auf uns.</p></div></div>
+        </div>
+
+        <div class="faq__item">
+          <h3><button class="faq__q" type="button" id="faq-q-6" aria-expanded="false" aria-controls="faq-p-6">Könnt ihr auch meine bestehende Website übernehmen?<span class="faq__icon" aria-hidden="true"></span></button></h3>
+          <div class="faq__panel"><div id="faq-p-6" role="region" aria-labelledby="faq-q-6"><p>Ja. Wir prüfen zuerst, ob sich eine Überarbeitung lohnt oder ein Neuaufbau wirtschaftlicher ist — und sagen Ihnen das ehrlich. Bestehende Inhalte, Rankings und Domains ziehen bei einem Relaunch sauber mit um, ohne SEO-Verluste.</p></div></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================= 15 ABSCHLUSS-CTA -->
+  <section class="section cta" id="kontakt">
+    <div class="shell grid12">
+      <h2 class="cta__title" data-reveal>Lassen Sie uns über<br>Ihre Website sprechen.</h2>
+      <div class="cta__actions" data-reveal>
+        <a class="btn" href="https://cal.com/surhay/erstgespraech">Kostenloses Erstgespräch</a>
+        <a class="link" href="mailto:hallo@surhay.design"><span class="link__label">hallo@surhay.design</span></a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ========================================================== 16 FOOTER -->
+<footer class="footer">
+  <div class="shell">
+    <div class="grid12 footer__grid">
+
+      <div class="footer__brand">
+        <a class="wordmark" href="#top"><b>Surhay</b><span class="dot">.</span>Design</a>
+        <p>Websites, die verkaufen — aus Berlin. Design, Entwicklung und Wartung für KMU, Selbstständige und Startups.</p>
+      </div>
+
+      <div class="footer__col">
+        <h2>Navigation</h2>
+        <ul>
+          <li><a href="#leistungen">Leistungen</a></li>
+          <li><a href="#projekte">Projekte</a></li>
+          <li><a href="#prozess">Prozess</a></li>
+          <li><a href="#preise">Preise</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="/blog/">Blog</a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h2>Rechtliches</h2>
+        <ul>
+          <li><a href="/impressum/">Impressum</a></li>
+          <li><a href="/datenschutz/">Datenschutz</a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h2>Kontakt</h2>
+        <p>Berlin, Deutschland</p>
+        <ul>
+          <li><a href="mailto:hallo@surhay.design">hallo@surhay.design</a></li>
+        </ul>
+        <p>Antwort innerhalb von 24&nbsp;h</p>
+      </div>
+
+    </div>
+
+    <div class="footer__bottom">
+      <p class="mono">© 2026 Surhay Design · Berlin</p>
+      <p class="mono">Entworfen &amp; entwickelt in Berlin</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* --- Header: Blur und Unterkante ab dem ersten Scrollen ---------------- */
+  var header = document.getElementById('siteHeader');
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      header.classList.toggle('is-scrolled', window.scrollY > 8);
+      ticking = false;
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* --- Mobilmenü: Vollbild-Overlay -------------------------------------- */
+  var burger = document.getElementById('burger');
+  var menu = document.getElementById('mobileMenu');
+  var pageMain = document.getElementById('main');
+  var pageFooter = document.querySelector('.footer');
+  function setMenu(open) {
+    document.body.classList.toggle('menu-open', open);
+    burger.setAttribute('aria-expanded', String(open));
+    burger.setAttribute('aria-label', open ? 'Menü schließen' : 'Menü öffnen');
+    /* Rest der Seite stilllegen, damit der Fokus nicht hinter das Overlay
+       laeuft. Der Header bleibt bewusst aktiv — der Burger liegt darin. */
+    if ('inert' in HTMLElement.prototype) {
+      pageMain.inert = open;
+      pageFooter.inert = open;
+    }
+    if (open) menu.querySelector('a').focus();
+  }
+  burger.addEventListener('click', function () {
+    setMenu(!document.body.classList.contains('menu-open'));
+  });
+  menu.addEventListener('click', function (e) {
+    if (e.target.closest('a')) setMenu(false);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && document.body.classList.contains('menu-open')) {
+      setMenu(false);
+      burger.focus();
+    }
+  });
+  window.addEventListener('resize', function () {
+    if (window.innerWidth > 1024 && document.body.classList.contains('menu-open')) setMenu(false);
+  });
+
+  /* --- Rotierende Zielgruppe in der Headline ---------------------------- */
+  var rotator = document.getElementById('rotator');
+  var branchen = ['Steuerberater', 'Rechtsanwälte', 'Zahnärzte', 'Handwerksbetriebe', 'Immobilienmakler', 'Praxen'];
+  if (rotator && !reduced) {
+    var i = 0;
+    window.setInterval(function () {
+      rotator.classList.add('is-out');
+      window.setTimeout(function () {
+        i = (i + 1) % branchen.length;
+        rotator.textContent = branchen[i];
+        rotator.classList.remove('is-out');
+      }, 320);
+    }, 2500);
+  }
+
+  /* --- FAQ-Accordion ---------------------------------------------------- */
+  document.querySelectorAll('.faq__q').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var item = btn.closest('.faq__item');
+      var open = item.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', String(open));
+    });
+  });
+
+  /* --- Scroll-Reveals --------------------------------------------------- */
+  var targets = document.querySelectorAll('[data-reveal]');
+  if (reduced || !('IntersectionObserver' in window)) {
+    targets.forEach(function (el) { el.classList.add('is-visible'); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
+    targets.forEach(function (el) { io.observe(el); });
+  }
+})();
+</script>
+
+</body>
+</html>

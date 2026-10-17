@@ -1,0 +1,51 @@
+# ---------------------------------------------------------------------------
+# Sicherheits- und Datenschutz-Header — nur fuer das Apache-Ziel (Hostinger).
+#
+# WOFUER DIESE DATEI DA IST
+# GitHub Pages liefert ausschliesslich seine eigenen Header aus; eigene lassen
+# sich dort nicht setzen. Was per <meta> geht, steht deshalb in
+# src/layouts/Base.astro (Content-Security-Policy, Referrer-Policy). Alles
+# uebrige — nosniff, Permissions-Policy, frame-ancestors, HSTS — gibt es nur
+# als echten HTTP-Header, und den kann nur ein Server wie Apache senden.
+#
+# Auf GitHub Pages ist diese Datei wirkungslos; der Pages-Workflow entfernt sie
+# deshalb vor dem Upload (.github/workflows/pages.yml).
+#
+# Die Header hier wiederholen die <meta>-Angaben absichtlich: Header und meta
+# gelten gemeinsam, und bei mehreren Richtlinien setzt sich jeweils die
+# strengere durch.
+# ---------------------------------------------------------------------------
+
+<IfModule mod_headers.c>
+  # Kein MIME-Sniffing: der Browser haelt sich an den gesendeten Content-Type.
+  Header always set X-Content-Type-Options "nosniff"
+
+  # Beim Verlassen der Seite geht nur die Herkunft mit, nie der volle Pfad.
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Nicht benoetigte Browser-Funktionen ausdruecklich abschalten. Die Website
+  # braucht keine davon; ein spaeter eingeschleustes Skript kann sie damit auch
+  # nicht anfordern.
+  Header always set Permissions-Policy "accelerometer=(), ambient-light-sensor=(), autoplay=(), browsing-topics=(), camera=(), display-capture=(), encrypted-media=(), geolocation=(), gyroscope=(), idle-detection=(), local-fonts=(), magnetometer=(), microphone=(), midi=(), payment=(), screen-wake-lock=(), serial=(), usb=(), xr-spatial-tracking=()"
+
+  # Klickjacking: die Seite darf in keinem fremden Rahmen stehen. Als <meta>
+  # nicht moeglich — frame-ancestors wirkt nur als echter Header.
+  Header always set Content-Security-Policy "frame-ancestors 'none'"
+
+  # HTTPS erzwingen.
+  #
+  # ACHTUNG VOR DEM SCHARFSTELLEN: Ein Browser, der diesen Header einmal
+  # gesehen hat, ruft die Domain fuer die angegebene Dauer nur noch ueber HTTPS
+  # auf — auch wenn das Zertifikat spaeter fehlt. Erst aktivieren, wenn HTTPS
+  # unter der Domain zuverlaessig laeuft. `includeSubDomains` zusaetzlich erst
+  # dann, wenn auch jede Subdomain ein gueltiges Zertifikat hat; `preload`
+  # (Aufnahme in die Browser-Liste) ist nur schwer rueckgaengig zu machen und
+  # bleibt bewusst weg.
+  Header always set Strict-Transport-Security "max-age=31536000"
+</IfModule>
+
+# Weiterleitung von HTTP auf HTTPS bewusst NICHT hier:
+# Hostinger schaltet sie im Panel („Force HTTPS“), und eine zweite Regel an
+# dieser Stelle erzeugt hinter dem Proxy leicht eine Endlosschleife. Nach dem
+# Livegang pruefen, ob http://<domain> tatsaechlich mit 301 auf https://
+# antwortet — auf GitHub Pages tut sie das (geprueft am 5. September 2026).

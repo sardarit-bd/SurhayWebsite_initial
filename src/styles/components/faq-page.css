@@ -1,0 +1,85 @@
+/* Aus src/components/pages/FaqPage.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-faq-page] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-faq-page="" an jedes eigene Element. */
+
+/* Der Rahmen stand auf der Haarlinie (1.36:1) und der Fokusring war durch
+     `outline-none` ausgeschaltet — beides behoben: Bedienelement-Stufe fuer
+     den Rahmen (WCAG 1.4.11), eigener Ring fuer den Fokus (WCAG 2.4.7).
+     `!important` beim Rahmen, weil die Ruhefarbe inline am Element steht. */#faq-search[data-c-faq-page]:focus {
+    border-color: var(--color-ink) !important;
+  }
+
+  #faq-search[data-c-faq-page]:focus-visible {
+    outline: 3px solid var(--color-accent-600);
+    outline-offset: 3px;
+  }
+
+  .jump-link[data-c-faq-page] {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.5rem 0.9rem;
+    /* Als Chip ist der Rahmen die Umrandung eines Bedienelements. Ab 1024 px
+       wird daraus eine ruhige Liste ohne Rahmen — dort traegt der Abstand
+       die Trennung, und die 3:1 sind gegenstandslos. */
+    border: 1px solid var(--line-control);
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 550;
+    color: var(--color-mute);
+    text-decoration: none;
+    transition:
+      color var(--dur-micro) var(--ease-micro),
+      border-color var(--dur-micro) var(--ease-micro),
+      background-color var(--dur-micro) var(--ease-micro);
+  }
+  /* Die Zahl ist Information — wie viele Fragen in der Gruppe stehen —, kein
+     Ornament. Mit opacity 0.75 trug sie 2.97:1 und war damit unter dem
+     Grenzwert (WCAG 1.4.3). Ohne die Abdunklung sind es 5.13:1; leiser als
+     der Titel bleibt sie ueber Groesse und Farbe. */.jump-count[data-c-faq-page] {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-mute);
+  }
+  @media (hover: hover) and (pointer: fine){
+    .jump-link[data-c-faq-page]:hover {
+      color: var(--color-ink);
+      border-color: var(--color-ink);
+    }
+  }
+
+  /* Ab lg wird aus der Chip-Reihe eine ruhige Liste: der Rahmen faellt weg,
+     die Trennung uebernimmt der Abstand. */@media (min-width: 1024px){
+    .jump-link[data-c-faq-page] {
+      border-color: transparent;
+      border-radius: 0.6rem;
+      padding-inline: 0.75rem;
+    }
+    @media (hover: hover) and (pointer: fine){
+      .jump-link[data-c-faq-page]:hover {
+        border-color: transparent;
+        background: var(--color-paper-2);
+      }
+    }
+  }
+
+  /* Trennung der Gruppen liegt in CSS statt in Klassen am Element: Beim
+     Filtern wandert die erste sichtbare Gruppe nach oben und darf dann
+     keine Trennlinie ueber sich haben (`is-first` setzt JS). */.faq-group[data-c-faq-page] + .faq-group[data-c-faq-page] {
+    margin-top: 4rem;
+    border-top: 1px solid var(--line);
+    padding-top: 3.5rem;
+  }
+  .faq-group.is-first[data-c-faq-page] {
+    margin-top: 0;
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  /* Von der Suche ausgeblendet — nicht `hidden`, damit die Regel auch
+     Elemente mit eigener display-Angabe trifft. */.is-filtered-out[data-c-faq-page] {
+    display: none !important;
+  }

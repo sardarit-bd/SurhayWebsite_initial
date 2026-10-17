@@ -1,0 +1,15 @@
+/* Aus src/layouts/Legal.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-legal] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-legal="" an jedes eigene Element. */
+
+/* Ruhiger Kasten im Papierton — er soll den Rechtstext einordnen, nicht
+     wie eine Warnung ueber ihm stehen. */.legal-notice[data-c-legal] {
+    max-width: 46rem;
+    padding: 1.25rem 1.4rem;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--color-accent-600);
+    border-radius: 0.9rem;
+    background: var(--color-paper-2);
+  }

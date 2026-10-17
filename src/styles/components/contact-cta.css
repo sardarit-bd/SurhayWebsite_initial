@@ -1,0 +1,74 @@
+/* Aus src/components/ContactCta.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-contact-cta] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-contact-cta="" an jedes eigene Element. */
+
+/* ------------------------------------------------------------ Abgrenzung
+     Die Sektion folgt auf jeder Seite auf anderen Inhalt und muss trotzdem
+     ueberall als eigener, abgeschlossener Block lesbar sein. Das leisten drei
+     Dinge zusammen: viel Luft nach oben, die weisse Karte auf Papier — und
+     der dunkle Footer, der direkt darunter beginnt und den Block nach unten
+     schliesst. Deshalb ist der Abstand nach unten kleiner als der nach oben:
+     die Sektion gehoert zum Seitenende, nicht zum vorigen Thema. */.cta-form[data-c-contact-cta] {
+    background: var(--color-paper);
+    padding-top: 72px;
+    padding-bottom: var(--spacing-section-sm);
+  }
+
+  .cta-form-card[data-c-contact-cta] {
+    /* --cf-surface dreht die Flaechen des Formulars um: Auf der weissen Karte
+       waeren weisse Eingabefelder nur noch an ihrem Rahmen zu erkennen.
+       Vererbt sich an ContactForm, s. dortigen Stilblock. */
+    --cf-surface: var(--color-paper);
+    background: var(--color-white);
+    border: 1px solid var(--line);
+    border-radius: 1rem; /* = rounded-2xl der uebrigen Karten */
+    padding: 56px 24px;
+  }
+
+  /* Eine Spalte fuer alles — Eyebrow, Headline, Subline und Formular stehen
+     auf derselben Kante. Das Formular allein zu zentrieren, waehrend die
+     Headline ueber die volle Kartenbreite laeuft, zerreisst den Block. */.cta-form-col[data-c-contact-cta] {
+    max-width: 640px;
+    margin-inline: auto;
+  }
+
+  .cta-form-direct[data-c-contact-cta] {
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    color: var(--color-mute);
+  }
+
+  .cta-form-body[data-c-contact-cta] {
+    margin-top: 3rem;
+  }
+
+  @media (min-width: 810px){
+    .cta-form-card[data-c-contact-cta] {
+      padding-inline: 40px;
+    }
+  }
+
+  @media (min-width: 1024px){
+    .cta-form[data-c-contact-cta] {
+      padding-top: 120px;
+    }
+
+    .cta-form-card[data-c-contact-cta] {
+      padding-block: 96px;
+      padding-inline: 56px;
+    }
+  }
+
+  /* Unter 390 px: seitlich enger, Headline eine Stufe kleiner. Beides aus der
+     bestehenden Skala — --text-h3 ist die naechstkleinere Stufe unter
+     --text-h2-sm. */@media (max-width: 389px){
+    .cta-form-card[data-c-contact-cta] {
+      padding-inline: 20px;
+    }
+
+    .cta-form-title[data-c-contact-cta] {
+      font-size: var(--text-h3);
+    }
+  }

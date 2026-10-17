@@ -1,0 +1,118 @@
+/* Aus src/components/Configurator.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-configurator] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-configurator="" an jedes eigene Element. */
+
+.option-card[data-c-configurator] {
+    display: block;
+    cursor: pointer;
+    /* Der Rahmen ist die Kachel — Bedienelement-Stufe, 3:1 (WCAG 1.4.11). */
+    border: 1.5px solid var(--line-control);
+    border-radius: 1rem;
+    background: var(--color-white);
+    padding: 1.4rem;
+    transition:
+      border-color var(--dur-micro) var(--ease-micro),
+      transform var(--dur-micro) var(--ease-micro);
+  }
+  @media (hover: hover) and (pointer: fine){
+    .option-card[data-c-configurator]:hover {
+      border-color: var(--color-ink);
+      transform: translateY(-4px);
+    }
+  }
+  .option-card[data-c-configurator]:has(input:checked) {
+    border-color: var(--color-ink);
+    box-shadow: 0 0 0 1.5px var(--color-ink);
+  }
+  .option-card[data-c-configurator] .option-title[data-c-configurator]::before {
+    content: '';
+    display: inline-block;
+    width: 0.65rem;
+    height: 0.65rem;
+    margin-right: 0.55rem;
+    border-radius: 50%;
+    /* Der Ring ist der Auswahlknopf: ohne ihn ist nicht zu sehen, dass hier
+       etwas an- oder abgewaehlt werden kann. */
+    border: 1.5px solid var(--line-control);
+    vertical-align: baseline;
+    transition:
+      background-color var(--dur-micro) var(--ease-micro),
+      border-color var(--dur-micro) var(--ease-micro);
+  }
+  .option-card[data-c-configurator]:has(input:checked) .option-title[data-c-configurator]::before {
+    background: var(--color-accent-600);
+    border-color: var(--color-ink);
+  }
+  .option-card[data-c-configurator]:has(input:focus-visible) {
+    outline: 3px solid var(--color-accent-600);
+    outline-offset: 3px;
+  }
+  .option-price.is-included[data-c-configurator] {
+    color: var(--color-mute);
+    text-decoration: line-through;
+  }
+  fieldset[data-c-configurator] legend[data-c-configurator] {
+    padding: 0;
+  }
+  .cfg-step[data-c-configurator]:focus {
+    outline: none;
+  }
+
+  .cfg-input[data-c-configurator] {
+    transition: border-color var(--dur-short) var(--ease-out);
+  }
+
+  .cfg-input[data-c-configurator]:focus {
+    border-color: var(--color-ink) !important;
+  }
+
+  /* Der Fokusring stand vorher unter `outline-none`, das die globale
+     :focus-visible-Regel schlug — der Umriss fehlte damit auf allen drei
+     Feldern (WCAG 2.4.7). */.cfg-input[data-c-configurator]:focus-visible {
+    outline: 3px solid var(--color-accent-600);
+    outline-offset: 3px;
+  }
+
+  .cfg-error-box[data-c-configurator] {
+    border-color: #b3261e;
+    color: #b3261e;
+  }
+
+  /* Der Schritt wird beim Weiterklicken programmatisch fokussiert — dort ist
+     ein Umriss unerwuenscht. Wer ihn selbst antippt (Tastatur), bekommt ihn. */.cfg-step[data-c-configurator]:focus-visible {
+    outline: 3px solid var(--color-accent-600);
+    outline-offset: 6px;
+  }
+
+  /* Ohne JS: alle Schritte untereinander sichtbar (Formular bleibt nutzbar).
+     Mit JS (.js-wizard): nur der aktive Schritt, mit sanftem Einblenden. */.cfg-step[data-c-configurator] + .cfg-step[data-c-configurator] {
+    margin-top: 3.5rem;
+  }
+  form.js-wizard .cfg-step[data-c-configurator] {
+    display: none;
+    margin-top: 0;
+  }
+  form.js-wizard .cfg-step.is-active[data-c-configurator] {
+    display: block;
+    animation: step-in var(--dur-panel) var(--ease-out);
+  }
+  @keyframes step-in{
+    from{
+      opacity: 0;
+      transform: translateY(var(--move-block));
+    }
+    to{
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .option-card[data-c-configurator]:hover {
+      transform: none;
+    }
+    form.js-wizard .cfg-step.is-active[data-c-configurator] {
+      animation: none;
+    }
+  }

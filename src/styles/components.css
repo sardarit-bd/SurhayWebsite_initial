@@ -1,0 +1,30 @@
+/* Alle Bauteil-Styles, die unter Astro in <style>-Bloecken standen.
+   Einmal aus dem Wurzel-Layout eingebunden — Astro haengte sie pro Seite
+   an; Next buendelt sie selbst. Angewandt wird dasselbe. */
+
+@import './components/configurator.css';
+@import './components/contact-cta.css';
+@import './components/contact-form.css';
+@import './components/footer.css';
+@import './components/header.css';
+@import './components/language-switcher.css';
+@import './components/service-icon.css';
+@import './components/contact-page.css';
+@import './components/faq-page.css';
+@import './components/process-page.css';
+@import './components/service-detail-page.css';
+@import './components/services-page.css';
+@import './components/work-index-page.css';
+@import './components/contact.css';
+@import './components/facts-grid.css';
+@import './components/hero.css';
+@import './components/insights.css';
+@import './components/process.css';
+@import './components/services.css';
+@import './components/studio.css';
+@import './components/tech-stack.css';
+@import './components/trust-bar.css';
+@import './components/work.css';
+@import './components/blog-index.css';
+@import './components/blog-post.css';
+@import './components/legal.css';

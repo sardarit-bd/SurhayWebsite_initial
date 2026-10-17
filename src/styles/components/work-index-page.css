@@ -1,0 +1,48 @@
+/* Aus src/components/pages/WorkIndexPage.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-work-index-page] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-work-index-page="" an jedes eigene Element. */
+
+/* Der Rahmen ist die Schaltflaeche — Bedienelement-Stufe statt Haarlinie
+     (WCAG 1.4.11, 3:1). */.filter-btn[data-c-work-index-page] {
+    border-color: var(--line-control);
+    color: var(--color-mute);
+  }
+  .filter-btn[data-c-work-index-page]:hover {
+    color: var(--color-ink);
+    border-color: var(--color-ink);
+  }
+  .filter-btn.is-active[data-c-work-index-page] {
+    background: var(--color-accent-600);
+    border-color: var(--color-accent-600);
+    color: var(--color-white);
+  }
+  /* Der Zoom bleibt langsam, aber innerhalb der Obergrenze von 600 ms. */.case-image[data-c-work-index-page] {
+    transition: transform var(--dur-reveal) var(--ease-out);
+  }
+
+  .case-arrow[data-c-work-index-page] {
+    transition: transform var(--dur-micro) var(--ease-micro);
+  }
+
+  .case-card[data-c-work-index-page] {
+    text-decoration: none;
+    transition:
+      transform var(--dur-micro) var(--ease-micro),
+      border-color var(--dur-micro) var(--ease-micro);
+  }
+  @media (hover: hover) and (pointer: fine){
+    .case-card[data-c-work-index-page]:hover {
+      border-color: var(--color-ink);
+      transform: translateY(-4px);
+    }
+  }
+  .case-card.is-filtered-out[data-c-work-index-page] {
+    display: none;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .case-card[data-c-work-index-page]:hover {
+      transform: none;
+    }
+  }

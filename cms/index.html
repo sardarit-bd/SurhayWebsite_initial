@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Content Manager — Surhay Design</title>
+  </head>
+  <body>
+    <!--
+      Decap CMS (Git-basiert, GitHub als Backend). Konfiguration: config.yml
+
+      NICHT VEROEFFENTLICHT — und warum
+      Dieser Ordner liegt bewusst ausserhalb von public/ und wird deshalb
+      nicht mitgebaut. Solange das Skript unten von unpkg.com nachgeladen
+      wird, ist der Aufruf dieser Seite eine Uebermittlung der IP-Adresse an
+      einen Drittanbieter — ohne Einwilligung und ohne Nennung in der
+      Datenschutzerklaerung. Decap legt ausserdem ungefragt einen
+      localStorage-Eintrag und eine IndexedDB an (§ 25 TDDDG).
+
+      VOR DEM WIEDERAKTIVIEREN
+      1. decap-cms.js selbst hosten statt vom CDN laden — dann faellt der
+         Drittanbieter-Request weg. Ohne diesen Schritt nicht veroeffentlichen.
+      2. Ordner nach public/admin/ zurueckschieben.
+      3. config.yml: repo und base_url eintragen (stehen dort noch auf
+         Platzhaltern, der Login funktioniert bis dahin ohnehin nicht).
+      4. Den Speicherzugriff (localStorage, IndexedDB) rechtlich einordnen:
+         Redaktionswerkzeug hinter Login ist nicht dasselbe wie eine
+         Besucherseite — das gehoert bewertet, nicht angenommen.
+    -->
+    <!-- <script src="https://unpkg.com/decap-cms@^3.8.4/dist/decap-cms.js"></script> -->
+  </body>
+</html>

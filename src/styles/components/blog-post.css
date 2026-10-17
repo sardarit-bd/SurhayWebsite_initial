@@ -1,0 +1,60 @@
+/* Aus src/layouts/BlogPost.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-blog-post] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-blog-post="" an jedes eigene Element. */
+
+/* Lange deutsche Komposita duerfen umbrechen.
+
+     Bei 280 px ist eine Zwischenueberschrift wie „Zwischenueberschriften“ in
+     1.7rem breiter als die ganze Textspalte und schob die Seite waagerecht
+     auf. Die Regel greift nur, wenn ein Wort sonst ueberliefe — an der
+     Zeilenfuehrung auf breiten Viewports aendert sie nichts. Sie steht auf
+     `article`, weil `overflow-wrap` vererbt wird und damit Titel,
+     Fliesstext und Kacheln in einem Zug erreicht. */article[data-c-blog-post] {
+    overflow-wrap: break-word;
+  }
+
+  /* Dasselbe Problem eine Ebene hoeher, ebenfalls vorgefunden: Bei 280 px
+     schob diese Kachelreihe die Seite um 39 px auf. Eine Rasterzelle hat
+     `min-width: auto` und schrumpft nie unter ihre eigene Mindestbreite —
+     die bestimmt das laengste Wort. `overflow-wrap` allein aendert die
+     Mindestbreite nicht, die Zelle muss zusaetzlich schrumpfen duerfen. */.related-list[data-c-blog-post] > li[data-c-blog-post] {
+    min-width: 0;
+  }
+
+  .related-card[data-c-blog-post] {
+    text-decoration: none;
+    transition:
+      transform var(--dur-micro) var(--ease-micro),
+      border-color var(--dur-micro) var(--ease-micro);
+  }
+  @media (hover: hover) and (pointer: fine){
+    .related-card[data-c-blog-post]:hover {
+      transform: translateY(-3px);
+      border-color: var(--color-ink);
+    }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .related-card[data-c-blog-post]:hover {
+      transform: none;
+    }
+  }
+
+  /* Zeilenlaenge des Fliesstextes.
+
+     Ohne die rechte Spalte traegt der Absatz seine Breite allein; die
+     globalen 65ch von `.prose` ergeben in dieser Schrift gemessene 80
+     Zeichen je Zeile, weil `ch` die Ziffer Null misst und die schmaler
+     gesetzten Buchstaben mehr Platz finden. 58ch ergibt gemessen 72
+     Zeichen — die Mitte des lesbaren Bereichs. Der Wert steht bewusst hier
+     und nicht in `.prose`: Case Studies und Rechtstexte behalten ihre
+     Breite. */.prose[data-c-blog-post] {
+    max-width: 58ch;
+  }
+
+  /* Die Ueberschriften behalten ihre IDs, auch ohne Inhaltsverzeichnis:
+     Deep-Links auf einen Abschnitt bleiben so gueltig. Ihr Sprungziel darf
+     nicht unter der fixierten Leiste landen. */.prose[data-c-blog-post] h2 {
+    scroll-margin-top: 6.5rem;
+  }

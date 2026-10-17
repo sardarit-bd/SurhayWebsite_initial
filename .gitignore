@@ -1,0 +1,35 @@
+# dependencies
+node_modules/
+
+# environment
+.env
+.env.*
+
+# macOS
+.DS_Store
+
+# logs
+npm-debug.log*
+
+# Next.js
+.next/
+out/
+out-pages/
+next-env.d.ts
+tsconfig.tsbuildinfo
+
+# Referenz-Builds der Astro-Fassung (Migrations-Nachweis, nicht versionieren)
+.reference-dist-root/
+.reference-dist-pages/
+
+# von scripts/build-inline.mjs erzeugt
+src/inline/generated.ts
+
+# von scripts/sync-case-study-routes.mjs erzeugt — die Case-Study-Detailroute
+# existiert nur, solange mindestens eine Case Study real: true traegt
+src/app/*/projekte/[slug]/
+src/app/*/*/projeler/[slug]/
+src/app/*/*/work/[slug]/
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 36" width="60" height="36" role="presentation">
+  <title>United Kingdom</title>
+  <clipPath id="gb-field"><path d="M0 0h60v36H0z"/></clipPath>
+  <clipPath id="gb-counterchange"><path d="M30 18 h30 v18 z v18 h-30 z h-30 v-18 z v-18 h30 z"/></clipPath>
+  <g clip-path="url(#gb-field)">
+    <path d="M0 0h60v36H0z" fill="#012169"/>
+    <path d="M0 0 60 36M60 0 0 36" stroke="#fff" stroke-width="7.2"/>
+    <path d="M0 0 60 36M60 0 0 36" clip-path="url(#gb-counterchange)" stroke="#c8102e" stroke-width="2.4"/>
+    <path d="M30 0v36M0 18h60" stroke="#fff" stroke-width="12"/>
+    <path d="M30 0v36M0 18h60" stroke="#c8102e" stroke-width="7.2"/>
+  </g>
+</svg>
