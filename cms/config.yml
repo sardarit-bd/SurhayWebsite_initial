@@ -1,0 +1,148 @@
+# ---------------------------------------------------------------------------
+# Decap CMS — Konfiguration
+#
+# WICHTIG vor dem ersten Login:
+# 1. `repo:` auf euer GitHub-Repository ändern (owner/name).
+# 2. GitHub-Backend braucht einen OAuth-Flow. Da Hostinger-Static-Hosting den
+#    Handshake nicht selbst machen kann, gibt es zwei bewährte Wege:
+#      a) Externer OAuth-Provider (kostenlos, schnell eingerichtet), z. B.
+#         https://github.com/vencax/netlify-cms-github-oauth-provider auf einem
+#         kleinen Server/Cloudflare Worker — dann `base_url` entsprechend setzen.
+#      b) Ein PHP-OAuth-Proxy direkt auf Hostinger (Hostinger kann PHP!).
+#    Details und Links: siehe README.md → "CMS einrichten".
+# ---------------------------------------------------------------------------
+
+backend:
+  name: github
+  repo: OWNER/surhay-website # TODO: GitHub-Repo eintragen
+  branch: main
+  base_url: https://DEIN-OAUTH-PROXY.example.com # TODO: OAuth-Provider eintragen
+  commit_messages:
+    create: 'content: {{collection}} „{{slug}}“ angelegt'
+    update: 'content: {{collection}} „{{slug}}“ aktualisiert'
+    delete: 'content: {{collection}} „{{slug}}“ gelöscht'
+    uploadMedia: 'media: {{path}} hochgeladen'
+    deleteMedia: 'media: {{path}} gelöscht'
+
+# Deutsch als Standard, Tuerkisch und Englisch als Uebersetzungen —
+# Ordnerstruktur: src/content/<collection>/<de|tr|en>/<slug>.md.
+# Der Dateiname ist in allen drei Ordnern derselbe: daraus baut der
+# Sprachumschalter die Alternates (siehe src/i18n/utils.ts → altPaths).
+i18n:
+  structure: multiple_folders
+  locales: [de, tr, en]
+  default_locale: de
+
+locale: de
+site_url: https://surhay.design
+display_url: https://surhay.design
+logo_url: https://surhay.design/favicon.svg
+
+media_folder: 'public/uploads'
+public_folder: '/uploads'
+
+collections:
+  # ------------------------------------------------------------ Case Studies
+  - name: case-studies
+    label: 'Case Studies'
+    label_singular: 'Case Study'
+    folder: 'src/content/case-studies'
+    create: true
+    format: 'frontmatter'
+    slug: '{{slug}}'
+    i18n: true
+    sortable_fields: [date, title, client]
+    fields:
+      - { name: title, label: 'Titel', widget: string, i18n: true }
+      - { name: client, label: 'Kunde', widget: string, i18n: duplicate }
+      - { name: industry, label: 'Branche', widget: string, i18n: true, hint: 'Wird als Portfolio-Filter angezeigt, z. B. „E-Commerce“' }
+      - { name: excerpt, label: 'Kurzbeschreibung', widget: text, i18n: true, hint: 'Erscheint auf der Portfolio-Karte (1–2 Sätze)' }
+      - { name: situation, label: 'Ausgangslage', widget: text, i18n: true }
+      - { name: solution, label: 'Lösung', widget: text, i18n: true }
+      - name: results
+        label: 'Ergebnis-Kennzahlen'
+        widget: list
+        i18n: true
+        min: 1
+        max: 4
+        summary: '{{fields.prefix}}{{fields.value}}{{fields.suffix}} — {{fields.label}}'
+        fields:
+          - { name: value, label: 'Wert (Zahl)', widget: number, value_type: float }
+          - { name: prefix, label: 'Präfix', widget: string, required: false, hint: 'z. B. „+“ oder „−“' }
+          - { name: suffix, label: 'Suffix', widget: string, required: false, hint: 'z. B. „ %“ oder „ s“' }
+          - { name: label, label: 'Beschriftung', widget: string }
+      - { name: cover, label: 'Cover-Bild', widget: image, i18n: duplicate }
+      - { name: coverAlt, label: 'Cover Alt-Text', widget: string, i18n: true }
+      - { name: gallery, label: 'Galerie', widget: list, field: { name: image, label: 'Bild', widget: image }, required: false, i18n: duplicate }
+      - { name: date, label: 'Datum', widget: datetime, format: 'YYYY-MM-DD', time_format: false, i18n: duplicate }
+      - { name: featured, label: 'Hervorgehoben', widget: boolean, default: false, i18n: duplicate }
+      - { name: real, label: 'Echtes Projekt (auf Startseite zeigen)', widget: boolean, default: false, i18n: duplicate, hint: 'Erst aktivieren, wenn Projekt, Kennzahlen und Kundenfreigabe vorliegen — sonst irreführende Werbung' }
+      - { name: body, label: 'Ausführlicher Bericht', widget: markdown, i18n: true }
+
+  # ------------------------------------------------------------- Testimonials
+  - name: testimonials
+    label: 'Testimonials'
+    label_singular: 'Testimonial'
+    folder: 'src/content/testimonials'
+    create: true
+    format: 'frontmatter'
+    slug: '{{slug}}'
+    i18n: true
+    sortable_fields: [order, name]
+    fields:
+      - { name: name, label: 'Name', widget: string, i18n: duplicate }
+      - { name: company, label: 'Firma', widget: string, i18n: duplicate }
+      - { name: quote, label: 'Zitat', widget: text, i18n: true }
+      - { name: photo, label: 'Foto', widget: image, i18n: duplicate }
+      - { name: order, label: 'Reihenfolge', widget: number, default: 99, value_type: int, i18n: duplicate }
+      - { name: real, label: 'Echte Kundenstimme (auf Startseite zeigen)', widget: boolean, default: false, i18n: duplicate, hint: 'Nur mit schriftlicher Freigabe der zitierten Person aktivieren' }
+
+  # ---------------------------------------------------------- Blog / Insights
+  - name: blog
+    label: 'Blog / Insights'
+    label_singular: 'Artikel'
+    folder: 'src/content/blog'
+    create: true
+    format: 'frontmatter'
+    slug: '{{slug}}'
+    i18n: true
+    sortable_fields: [date, title]
+    fields:
+      - { name: title, label: 'Titel', widget: string, i18n: true }
+      - { name: category, label: 'Kategorie', widget: string, i18n: true, hint: 'z. B. Strategie, Performance, SEO, Inhalte, Barrierefreiheit' }
+      - { name: author, label: 'Autor', widget: string, default: 'Surhay', i18n: duplicate }
+      - { name: date, label: 'Datum', widget: datetime, format: 'YYYY-MM-DD', time_format: false, i18n: duplicate }
+      - { name: metaTitle, label: 'Meta-Title', widget: string, required: false, i18n: true, hint: 'Für Google (max. ~60 Zeichen). Leer = Artikel-Titel' }
+      - { name: metaDescription, label: 'Meta-Description', widget: text, i18n: true, hint: 'Für Google (max. ~155 Zeichen)' }
+      - { name: ogImage, label: 'OG-Image', widget: image, required: false, i18n: duplicate, hint: 'Vorschaubild beim Teilen (1200×630). Leer = Standard' }
+      - { name: body, label: 'Inhalt', widget: markdown, i18n: true }
+
+  # -------------------------------------------------------------------- FAQ
+  - name: faq
+    label: 'FAQ'
+    label_singular: 'Frage'
+    folder: 'src/content/faq'
+    create: true
+    format: 'frontmatter'
+    slug: '{{slug}}'
+    i18n: true
+    sortable_fields: [order]
+    fields:
+      - { name: question, label: 'Frage', widget: string, i18n: true }
+      # Werte gespiegelt aus src/data/faq-categories.ts — dort steht auch,
+      # was passiert, wenn eine ID geaendert wird (Anker und URLs).
+      - name: category
+        label: 'Themengruppe'
+        widget: select
+        default: 'preise'
+        i18n: duplicate
+        options:
+          - { label: 'Preise & Angebot', value: 'preise' }
+          - { label: 'Ablauf & Termine', value: 'ablauf' }
+          - { label: 'Zusammenarbeit & Passung', value: 'zusammenarbeit' }
+          - { label: 'Technik & Hosting', value: 'technik' }
+          - { label: 'Pflege & Wartung', value: 'pflege' }
+          - { label: 'Bestehende Website & Relaunch', value: 'bestand' }
+          - { label: 'Recht & Barrierefreiheit', value: 'recht' }
+      - { name: order, label: 'Reihenfolge', widget: number, default: 99, value_type: int, i18n: duplicate }
+      - { name: body, label: 'Antwort', widget: markdown, i18n: true }

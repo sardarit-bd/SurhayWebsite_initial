@@ -1,0 +1,1809 @@
+@import 'tailwindcss';
+
+/* ---------------------------------------------------------------------------
+   SURHAY DESIGN — Designsystem
+   Farben, Typografie und Motion als CSS Custom Properties.
+   Tailwind v4 liest die @theme-Tokens und erzeugt daraus Utilities
+   (bg-ink, text-accent-600, font-display, …).
+--------------------------------------------------------------------------- */
+
+@theme {
+  /* Farbsystem — "Tinte, Papier, Amethyst" */
+  --color-ink: #0a0a0b; /* Fast-Schwarz, Basis dunkler Sektionen */
+  --color-ink-2: #141417; /* Erhöhte dunkle Fläche (Cards auf ink) */
+  --color-ink-3: #1e1e23; /* Linien/Borders auf dunklem Grund */
+  --color-paper: #f5f3ee; /* Warmes Off-White, Basis heller Sektionen */
+  --color-paper-2: #ebe8e0; /* Vertiefte helle Fläche */
+  --color-white: #ffffff;
+
+  /* Akzentskala — Teal. Drei Stufen mit klar getrennten Aufgaben:
+       600  Buttons, Links, Fokusring, aktive Zustaende — Schrift darauf WEISS
+       400  Marker, Indikatoren, Akzentflaechen        — Schrift darauf SCHWARZ
+       100  Hover-Flaechen und Tints                   — Schrift darauf SCHWARZ
+     Gemessene Kontraste:
+       weiss auf 600            5.36:1   600 als Text auf Papier   4.83:1
+       schwarz auf 400         10.95:1   400 als Text auf Tinte   10.95:1
+       schwarz auf 100         17.68:1   600 als Flaeche auf Tinte 3.69:1
+     400 darf NIE Textfarbe auf hellem Grund sein (1.63:1).
+
+     Zwei Randstufen kamen mit den Zustaenden dazu:
+       800  Gedrueckt, und Hover auf bereits gefuellter Flaeche  — Schrift WEISS
+       300  Hellster Akzent, nur als Antwort auf Tinte           — nie Flaeche
+     Gemessene Kontraste:
+       weiss auf 800            7.27:1   300 als Text auf Tinte  13.65:1 */
+  --color-accent-800: #155e75;
+  --color-accent-600: #0e7490;
+  --color-accent-400: #22d3ee;
+  --color-accent-300: #67e8f9;
+  --color-accent-100: #cffafe;
+
+  /* Kontextabhaengiger Akzent: auf hellem Grund der Vollton, auf dunklem der
+     helle. Wird in .dark-section umdeklariert — ein var() im @theme-Wert
+     wuerde schon auf :root aufgeloest und wuerde nicht nachziehen. */
+  --color-accent-ctx: #0e7490;
+
+  /* Sekundaertext. Der Wert war #6d6c66 und trug auf `paper` 4.75:1 — aber
+     auf der vertieften Flaeche `paper-2` nur 4.30:1. Genau dort steht er
+     haeufig (Hinweiszeile im Aufklappmenue, Kachelraster auf Prozess-,
+     Preis- und Blogseiten), und 4.30 verfehlt AA. Eine Stufe dunkler loest
+     das ueberall auf einmal:
+       paper 5.13:1   paper-2 4.64:1   weiss 5.68:1   accent-100 5.08:1 */
+  --color-mute: #68675f; /* Sekundärtext auf hellem Grund (AA auf paper-2) */
+  --color-mute-dark: #a3a29a; /* Sekundärtext auf Tinte (7.72:1 auf ink) */
+
+  /* Typografie */
+  --font-display: 'Bricolage Grotesque Variable', 'Arial Black', sans-serif;
+  --font-body: 'Inter Variable', system-ui, sans-serif;
+
+  /* Layout — zwei Stufen. Vorher benutzten alle Sektionen denselben Wert,
+     dadurch wirkten Neben- und Hauptsektionen gleich gewichtig. */
+  --spacing-section: clamp(5rem, 12vw, 9rem); /* Haupt-Sektionen */
+  --spacing-section-sm: clamp(3rem, 7vw, 5.5rem); /* Vertrauenszeile, Insights */
+}
+
+:root {
+  /* Fluid-Typo-Skala */
+  --text-hero: clamp(2.8rem, 9.5vw, 7rem);
+  --text-h2: clamp(2.1rem, 5.5vw, 4rem);
+  --text-h2-sm: clamp(1.6rem, 3.2vw, 2.4rem);
+  --text-h3: clamp(1.35rem, 2.6vw, 1.75rem);
+  --text-lead: clamp(1.05rem, 1.6vw, 1.3rem);
+  /* Linienfarben kontextabhängig.
+
+     ZWEI STUFEN, ZWEI AUFGABEN
+     --line / --line-dark sind Haarlinien: Trennung zwischen Zeilen, Raster,
+     Rahmen um Flaechen. Sie tragen 1.36:1 bzw. 1.49:1 und duerfen das auch —
+     WCAG 1.4.11 verlangt 3:1 nur fuer Grafik, die man BRAUCHT, um ein
+     Bedienelement oder seinen Zustand zu erkennen. Eine Zeilentrennung
+     gehoert nicht dazu; der Inhalt steht daneben.
+
+     --line-control / --line-control-dark sind der sichtbare Rand eines
+     Bedienelements: Eingabefeld, Auswahlkachel, Umriss-Schaltflaeche,
+     Plus-Kreis im FAQ. Ohne diesen Rand ist nicht zu sehen, wo das Feld
+     anfaengt — hier gilt 3:1. Die Alpha-Werte sind gemessen, nicht geraten:
+       0.45 auf weiss 3.15:1 · auf paper 3.11:1 · auf paper-2 3.05:1
+       0.38 auf ink   3.27:1 · auf ink-2 3.34:1 · auf ink-3 3.31:1 */
+  --line: rgb(10 10 11 / 0.14);
+  --line-dark: rgb(245 243 238 / 0.16);
+  --line-control: rgb(10 10 11 / 0.45);
+  --line-control-dark: rgb(245 243 238 / 0.38);
+
+  /* ------------------------------------------------------- Motion-Tokens
+     Verbindlich für die ganze Seite. Bewegung erklärt einen Zustandswechsel,
+     sie schmückt ihn nicht: kein Spring, kein Overshoot. Die Obergrenze liegt
+     bei 600 ms; einzige Ausnahme ist der Flächen-Hover weiter unten, dessen
+     Kreis über eine ganze Zeilenbreite läuft und dafür bis 830 ms bekommt.
+     Animiert werden ausschließlich opacity, transform, height und Farben —
+     nie `all`, nie margin, padding, width oder box-shadow.
+     Sie stehen bewusst in :root statt in @theme: `--ease-*` ist in Tailwind
+     ein Utility-Namensraum, und wir wollen hier Tokens, keine Klassen. */
+
+  /* Kurven */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1); /* Eintritte, Reveals, Text-In */
+  --ease-panel: cubic-bezier(0.65, 0, 0.35, 1); /* Zweiwege: Höhe, Rotation */
+  --ease-micro: cubic-bezier(0.4, 0, 0.2, 1); /* Farbe, Border, Hover */
+  --ease-fill: cubic-bezier(0.19, 1, 0.22, 1); /* Kreis-Expansion beim Hover */
+
+  /* Dauern */
+  --dur-micro: 160ms; /* Hover, Farbwechsel, Fokus */
+  --dur-short: 240ms; /* Text-Fade, kleine Zustände */
+  --dur-base: 320ms; /* Icon-Transformation */
+  --dur-panel: 400ms; /* Panel öffnen */
+  --dur-panel-out: 300ms; /* Panel schließen — bewusst kürzer als öffnen */
+  --dur-fill-out: 498ms; /* Kreis zieht sich zusammen — kürzer als jede Expansion */
+  --dur-reveal: 600ms; /* Scroll-Reveal */
+
+  /* Distanzen */
+  --move-micro: 2px;
+  --move-text: 8px; /* Text-Eintritt innerhalb eines Panels */
+  --move-block: 24px; /* Block-Reveal beim Scrollen */
+
+  /* Rhythmus */
+  --stagger: 60ms; /* Versatz zwischen Geschwistern */
+
+  /* ------------------------------------------------------- Hoehe der Leiste
+     Die Kopfzeile ist fix positioniert und deckt damit die oberen Pixel jeder
+     Seite ab. Wer weiss, wie hoch sie ist, kann darunter anfangen — das
+     Burger-Menue tut genau das. Der Wert stand vorher nur als `h-[72px]` in
+     einer Utility-Klasse und war damit fuer niemanden sonst lesbar.
+
+     Das Skript in Header.astro schreibt die GEMESSENE Hoehe der Leiste hierher
+     zurueck (ResizeObserver). Die 72px sind also nur der Startwert fuer den
+     ersten Frame und fuer den Fall ohne JS — keine Annahme, an der etwas
+     zerbricht, wenn die Leiste je waechst. */
+  --header-h: 72px;
+
+  /* ---------------------------------------------------------- Ebenenordnung
+     Eine Leiter statt gewuerfelter Zahlen. Wer eine neue Ebene braucht, nimmt
+     eine Sprosse — und sieht auf einen Blick, wogegen er sich stellt.
+
+       --z-deko    Flaechen HINTER dem Text (Hero-Marker)
+       --z-inhalt  der normale Fluss
+       --z-sticky  mitlaufende Spalten, Sprachwahl-Aufklapper
+       --z-blatt   das Burger-Menue
+       --z-leiste  die Kopfzeile — liegt im Menuezustand ueber dem Blatt,
+                   damit Logo und Schliessen-Kreuz erreichbar bleiben
+       --z-sprung  die Sprungmarke; sie ist der Notausgang und gehoert
+                   deshalb ueber alles andere
+
+     Modals gibt es auf dieser Seite nicht, ein Cookie-Banner seit d015f2f
+     auch nicht mehr (er wurde eine eigene Seite). Beide bekaemen ihre Sprosse
+     zwischen --z-leiste und --z-sprung, sobald sie gebraucht werden.
+
+     Nicht in dieser Leiter stehen die z-index-Werte, die INNERHALB eines
+     Bauteils sortieren (`.marker::after`, `.fx-clip`): Sie ordnen Geschwister
+     in einem eigenen Stapelkontext und haben mit der Seitenebene nichts zu
+     tun. Sie zu Tokens zu machen wuerde eine Beziehung behaupten, die es
+     nicht gibt. */
+  --z-deko: -1;
+  --z-inhalt: 1;
+  --z-sticky: 10;
+  --z-blatt: 60;
+  --z-leiste: 70;
+  --z-sprung: 100;
+}
+
+/* Unter 810 px ist der Weg kürzer und der Daumen näher am Inhalt: gleiche
+   Kurven, knappere Werte. */
+@media (max-width: 809px) {
+  :root {
+    --dur-panel: 340ms;
+    --dur-reveal: 480ms;
+    --move-block: 16px;
+    --stagger: 40ms;
+  }
+}
+
+/* ------------------------------------------------------------------ Basis */
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5.5rem; /* fixe Navigation bei Ankersprüngen */
+  /* Scrollbar-Platz dauerhaft reservieren: verhindert, dass der Header
+     (und damit Burger/X) beim Scroll-Lock des Menüs seitlich springt */
+  scrollbar-gutter: stable;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+  /* Bei 320 px Breite (WCAG 1.4.10) passen einzelne Woerter nicht mehr in
+     die Spalte: „Datenschutzerklärung" in der Seitenueberschrift misst dort
+     371 px, die EU-Schlichtungs-URL im Impressum 306 px. Beide schoben den
+     Inhalt aus dem Fenster — und `overflow-x: clip` am body schnitt ihn dann
+     ab, statt ihn scrollbar zu machen: Inhaltsverlust statt Querbalken.
+
+     `break-word` greift ausschliesslich dann, wenn ein Wort sonst
+     ueberliefe. Auf jeder normalen Breite aendert sich dadurch nichts. */
+  overflow-wrap: break-word;
+}
+
+/* Unter 30em darf zusaetzlich getrennt werden. Sauberer als ein harter
+   Umbruch mitten im Wort — und im Deutschen der Normalfall, sobald die
+   Spalte schmal wird. Die Trennregeln kommen aus dem lang-Attribut am
+   <html>, das jede Seite korrekt setzt. Bewusst nur auf schmalen Schirmen:
+   auf dem Desktop soll die Typografie unberuehrt bleiben. */
+@media (max-width: 30em) {
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  li,
+  dd,
+  dt,
+  blockquote,
+  .display,
+  .h2,
+  .h3,
+  .lead {
+    hyphens: auto;
+  }
+}
+
+::selection {
+  background: var(--color-accent-600);
+  color: var(--color-white);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-accent-600);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Der Vollton traegt auf Tinte nur 3.69:1 — als Ring gerade noch zulaessig,
+   aber kaum zu sehen. Auf dunklem Grund ringt deshalb der helle Akzent
+   (10.95:1). Das Burger-Menue ist so ein Grund, auch wenn es keine
+   `.dark-section` ist. */
+.dark-section :focus-visible,
+#mobile-menu :focus-visible {
+  outline-color: var(--color-accent-400);
+}
+
+/* ------------------------------------------------------------ Trefferflaeche
+   WCAG 2.5.8 (Zielgroesse, minimal) verlangt 24x24 CSS-Pixel. Reine
+   Textlinks in Listen sind ueber ihre Zeilenhoehe rund 22 px hoch und
+   damit knapp darunter.
+
+   Der Ausweg ist kein groesserer Text und kein zusaetzliches Padding — beides
+   wuerde das Satzbild aendern. Stattdessen legt ein Pseudoelement eine
+   unsichtbare Flaeche ueber den Link hinaus. Layout, Zeilenabstand und die
+   Unterlinie von .link-slide (die an ::after haengt) bleiben unberuehrt.
+
+   -6px vertikal ergibt bei 22 px Zeilenhoehe 34 px. Die Fusszeilen-Listen
+   stehen 12 px auseinander, die Flaechen stossen also aneinander, ohne sich
+   zu ueberlappen — kein Ziel liegt ueber dem Nachbarn. */
+.tap-24 {
+  position: relative;
+}
+
+.tap-24::before {
+  content: '';
+  position: absolute;
+  inset: -6px -4px;
+  border-radius: 4px;
+}
+
+/* Überschriften */
+.display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  font-variation-settings: 'opsz' 96, 'wdth' 90;
+}
+
+.h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-h2);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  font-variation-settings: 'opsz' 60, 'wdth' 92;
+}
+
+/* Eine Stufe unter .h2 — fuer sekundaere Sektionen (Insights). Ohne sie
+   wiegt ein Nebenblock optisch genauso schwer wie Leistungen oder Preise,
+   und die Seite liest sich als flache Liste gleichrangiger Kapitel. */
+.h2-sm {
+  font-size: var(--text-h2-sm);
+  line-height: 1.08;
+}
+
+.h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-h3);
+  font-weight: 650;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.lead {
+  font-size: var(--text-lead);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+/* Eyebrow-Label über Sektionen: ● LEISTUNGEN */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.eyebrow::before {
+  content: '';
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--color-accent-ctx);
+  flex: none;
+}
+
+/* Der Akzentpunkt (Logo, Eyebrow): das einzige dauerhaft animierte Element */
+.pulse-dot {
+  animation: pulse-dot 3s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-dot {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------- Buttons */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 1.05rem 1.75rem;
+  border-radius: 999px;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-micro) var(--ease-micro),
+    color var(--dur-micro) var(--ease-micro),
+    border-color var(--dur-micro) var(--ease-micro);
+}
+
+.btn .btn-arrow {
+  transition: transform var(--dur-micro) var(--ease-micro);
+}
+
+/* Kompakte Variante für die Header-Leiste */
+.btn-sm {
+  padding: 0.7rem 1.25rem;
+  font-size: 0.9rem;
+}
+
+.btn-primary {
+  background: var(--color-accent-600);
+  color: var(--color-white);
+}
+
+/* Der Outline-Button fuellt sich beim Hover. Damit der Text nicht weiss
+   dasteht, bevor die Flaeche unter ihm gefuellt ist, zieht er 60 ms nach —
+   die Flaeche laeuft laenger und mit der Eintrittskurve, der Text kurz und
+   mit der Mikrokurve.
+   Welcher Akzent fuellt, entscheidet der Untergrund: auf Papier der Vollton
+   mit weisser Schrift, auf Tinte der helle mit schwarzer. 600 als Flaeche
+   auf Tinte traegt nur 3.69:1 und bliebe dort eine dunkle Beule. */
+.btn-ghost {
+  --ghost-fill: var(--color-accent-600);
+  --ghost-on: var(--color-white);
+  --ghost-deep: var(--color-accent-800);
+  --ghost-on-deep: var(--color-white);
+  /* Der Rahmen IST die Schaltflaeche — ohne ihn ist nicht zu sehen, wo sie
+     anfaengt. Deshalb die Bedienelement-Stufe (3:1, WCAG 1.4.11) statt der
+     Haarlinie, die hier vorher stand und nur 1.36:1 trug. */
+  border-color: var(--line-control);
+  color: var(--color-ink);
+  background: transparent;
+  transition:
+    background-color var(--dur-short) var(--ease-out),
+    border-color var(--dur-micro) var(--ease-micro),
+    color var(--dur-micro) var(--ease-micro) 60ms;
+}
+
+.dark-section .btn-ghost {
+  --ghost-fill: var(--color-accent-400);
+  --ghost-on: var(--color-ink);
+  --ghost-deep: var(--color-accent-600);
+  --ghost-on-deep: var(--color-white);
+  border-color: var(--line-control-dark);
+  color: var(--color-paper);
+}
+
+/* Tastaturfokus zeigt denselben Zustand wie der Hover — sonst waere der
+   gefuellte Button eine reine Mausbelohnung. */
+.btn-ghost:focus-visible {
+  background: var(--ghost-fill);
+  border-color: var(--ghost-fill);
+  color: var(--ghost-on);
+}
+
+/* Gedrueckt: eine Stufe tiefer, und ohne den Versatz des Textes — beim
+   Druck soll nichts nachlaufen. Gilt auch als Touch-Ersatz (§8). */
+.btn-primary:active,
+.btn-ghost:active {
+  transition-delay: 0s;
+}
+
+.btn-primary:active {
+  background: var(--color-accent-800);
+}
+
+.btn-ghost:active {
+  background: var(--ghost-deep);
+  border-color: var(--ghost-deep);
+  color: var(--ghost-on-deep);
+}
+
+/* Hover nur mit echter Zeigerspitze: Touch-Geraete halten :hover nach dem
+   Tippen sonst faelschlich fest. */
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover .btn-arrow {
+    transform: translateX(4px);
+  }
+  .btn-primary:hover {
+    background: var(--color-accent-800);
+  }
+  .btn-ghost:hover {
+    background: var(--ghost-fill);
+    border-color: var(--ghost-fill);
+    color: var(--ghost-on);
+  }
+}
+
+/* Link mit Unterstrich, der von links wächst (scaleX, GPU-freundlich) */
+.link-slide {
+  position: relative;
+  text-decoration: none;
+  padding-bottom: 2px;
+}
+
+.link-slide::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1.5px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-micro) var(--ease-micro);
+}
+
+.link-slide:hover::after,
+.link-slide:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* ------------------------------------------------------------- Kartenlink
+   Eine Karte, die als Ganzes ein Link ist (Blog-Teaser, Blog-Uebersicht).
+
+   DREI STUFEN
+   Nicht jede Flaeche antwortet gleich stark — die Staerke richtet sich
+   danach, was der Klick tut:
+     1  Kreis-Fill  ausschliesslich die Leistungs-Elemente (s. Flaechen-Hover)
+     2  Kartenlink  Rahmen, Flaeche, Link-Detail — hier
+     3  Ruhige Zelle nicht klickbare Raster (s. unten), minimal
+   Wenn alles gleich stark reagiert, verliert der starke Effekt seine
+   Bedeutung. Deshalb hier bewusst: kein Anheben, keine Skalierung, kein
+   wachsender Schatten.
+
+   --card-bg-hover setzt jede Karte selbst: die Grundflaechen sind
+   verschieden (weiss, Papier, vertieftes Papier), der Schritt soll ueberall
+   gleich klein ausfallen. */
+
+.card-link {
+  /* Standard: weisse Karte, die eine Spur waermer wird. */
+  --card-bg-hover: color-mix(in srgb, var(--color-paper) 45%, var(--color-white));
+  text-decoration: none;
+  transition:
+    background-color var(--dur-short) var(--ease-micro),
+    border-color var(--dur-short) var(--ease-micro);
+}
+
+/* Die Rahmenfarbe steht inline am Element — deshalb !important. */
+.card-link:focus-visible {
+  background: var(--card-bg-hover);
+  border-color: var(--color-accent-600) !important;
+}
+
+/* Touch-Ersatz: nur der Rahmen, ohne Unterlinie und ohne Pfeil. */
+.card-link:active {
+  border-color: var(--color-accent-600) !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card-link:hover {
+    background: var(--card-bg-hover);
+    border-color: var(--color-accent-600) !important;
+  }
+}
+
+/* Das Link-Detail der Karte: Wort, Unterlinie, Pfeil.
+   Der Pfeil liegt absolut in einem Streifen, der im Ruhezustand schon
+   freigehalten ist — so kann er erscheinen, ohne dass die Zeile verrutscht.
+   Die Unterlinie laeuft von links ein und nach rechts wieder hinaus; nur die
+   Skalierung wird animiert, die transform-origin springt hart mit.
+   Unterlinie und Pfeil stehen bewusst zusaetzlich zur Farbe: kein Zustand
+   darf allein ueber Farbe informieren.
+   Die Ueberschrift der Karte bleibt unberuehrt — sie ist der Grund, warum
+   jemand hinsieht, und darf beim Hover keinen Kontrast verlieren. */
+
+.read-more {
+  position: relative;
+  display: inline-block;
+  padding-right: 20px; /* Standplatz des Pfeils */
+  color: var(--color-ink);
+  transition: color var(--dur-micro) var(--ease-micro);
+}
+
+.read-more::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 20px; /* nur unter dem Wort, nicht unter dem Pfeil */
+  bottom: -3px;
+  height: 1.5px;
+  background: var(--color-accent-600);
+  transform: scaleX(0);
+  transform-origin: right; /* beim Verlassen zieht sie nach rechts weg */
+  transition: transform var(--dur-micro) var(--ease-out);
+}
+
+.read-more-arrow {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  opacity: 0;
+  transform: translate(-6px, -50%);
+  transition:
+    opacity var(--dur-short) var(--ease-out) 40ms,
+    transform var(--dur-short) var(--ease-out) 40ms;
+}
+
+.card-link:focus-visible .read-more {
+  color: var(--color-accent-600);
+}
+
+.card-link:focus-visible .read-more::after {
+  transform: scaleX(1);
+  transform-origin: left;
+  transition-duration: var(--dur-short);
+}
+
+.card-link:focus-visible .read-more-arrow {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card-link:hover .read-more {
+    color: var(--color-accent-600);
+  }
+  .card-link:hover .read-more::after {
+    transform: scaleX(1);
+    transform-origin: left;
+    transition-duration: var(--dur-short);
+  }
+  .card-link:hover .read-more-arrow {
+    opacity: 1;
+    transform: translate(0, -50%);
+  }
+}
+
+/* Reduzierte Bewegung: die Farben bleiben, die Wege entfallen. Die
+   Unterlinie erscheint ohne Aufziehen, der Pfeil ohne Weg, und was bleibt,
+   laeuft in der kuerzesten Dauer ab. */
+@media (prefers-reduced-motion: reduce) {
+  .card-link {
+    transition-duration: var(--dur-micro);
+  }
+  .read-more::after {
+    transition: none;
+  }
+  .read-more-arrow {
+    transform: translate(0, -50%);
+    transition: opacity var(--dur-micro) var(--ease-micro);
+  }
+}
+
+/* ------------------------------------------------------------ Ruhige Zelle
+   Stufe 3 — dunkle Raster aus Zellen in einem gemeinsamen Rahmen, die nicht
+   klickbar sind (Prinzipien, Regeln der Zusammenarbeit). Zweck ist
+   Leseunterstuetzung beim Ueberfliegen, nicht ein Interaktionsversprechen;
+   deshalb bewusst so schwach.
+   Die Trennlinien bleiben unberuehrt und die aktive Zelle bekommt keinen
+   Rahmen — das Raster ist eine Flaeche, keine Sammlung von Karten.
+   Genau eine Zelle ist hell: :hover kann nur an einer Stelle stehen, Ein-
+   und Ausblendung laufen dadurch von selbst gleichzeitig.
+   Auf Touch gibt es hier keinen Zustand. */
+
+.quiet-cell {
+  transition: background-color var(--dur-short) var(--ease-micro);
+}
+
+.quiet-num {
+  transition: color var(--dur-micro) var(--ease-micro);
+}
+
+/* Die Flaechenfarbe steht inline am Element — deshalb !important. */
+@media (hover: hover) and (pointer: fine) {
+  .quiet-cell:hover {
+    background: color-mix(in srgb, var(--color-white) 3%, var(--color-ink-2)) !important;
+  }
+  .quiet-cell:hover .quiet-num {
+    color: var(--color-accent-300);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quiet-cell {
+    transition-duration: var(--dur-micro);
+  }
+}
+
+/* ------------------------------------------------------------ Preis-Karte
+   Stufe 2 — die Karte ist kein Link, klickbar ist nur ihr Button. Sie
+   bekommt deshalb weder cursor: pointer noch einen Klick-Handler. Der Hover
+   hat trotzdem eine Aufgabe: er bereitet den Button vor, waehrend die Liste
+   noch gelesen wird. Vier leise Bewegungen gleichzeitig — die Karte hebt
+   sich mit wachsendem Schatten, ihre Flaeche wird heller, die Nachbarn
+   treten zurueck, der Button fuellt sich vor. Der vierte Punkt ist der
+   eigentliche Gewinn: der Klick fuehlt sich an wie etwas, das ohnehin
+   schon begonnen hat.
+
+   Kein farbiger Rahmen um die gehoverte Karte. Auf einer Preisliste liest
+   sich ein Akzentrahmen als „ausgewaehlt“ — der Hover auf Starter wuerde
+   die Empfehlung Business ueberschreiben. Auf Tinte waeren Rahmen, Haken
+   und Badge ausserdem nicht mehr auseinanderzuhalten, und ein heller
+   Rahmen auf Schwarz liest sich als Leuchtrand.
+
+   Drei Aufgaben, drei Ebenen:
+     .price-cell   Anhebung, Schatten, Badge — und das Reveal
+     .price-card   Flaeche, Rahmen, Abdunkeln der Nachbarn
+     .price-badge  haengt in der Zelle: hebt mit an, dunkelt aber nie ab
+
+   Angehoben wird mit `translate`, nicht mit `transform`: das Reveal setzt
+   auf derselben Zelle am Ende `transform: none`, zwei Regeln um dieselbe
+   Eigenschaft waeren ein Zufallsergebnis. Der Schatten liegt auf einer
+   eigenen Ebene und wird eingeblendet statt umgeschaltet — box-shadow wird
+   auf dieser Seite nicht animiert.
+   Anhebung und Schatten kommen immer zusammen: Anhebung ohne Schatten
+   sieht aus wie eine verrutschte Karte, das war der Grund fuer die
+   fruehere Regel „keine Bewegung“. 4 px sind bewusst wenig; ab 8 px kippt
+   die Reihe ins Verspielte. Raus geht es kuerzer als rein. */
+
+.price-cell {
+  --lift: 4px;
+  --dim-sibling: 0.88;
+  /* Helle Karte auf hellem Grund. */
+  --card-shadow:
+    0 1px 2px rgb(10 10 11 / 0.04),
+    0 2px 8px rgb(10 10 11 / 0.03);
+  --card-shadow-hover:
+    0 2px 4px rgb(10 10 11 / 0.05),
+    0 14px 36px rgb(10 10 11 / 0.09);
+  position: relative;
+  border-radius: 1rem; /* = rounded-2xl der Karte */
+  box-shadow: var(--card-shadow);
+  transition: translate var(--dur-short) var(--ease-out);
+}
+
+/* Dunkle Karte auf hellem Grund (Business): steht optisch hoeher und wirft
+   entsprechend mehr. */
+.price-cell--ink {
+  --card-shadow-hover:
+    0 4px 8px rgb(10 10 11 / 0.10),
+    0 18px 44px rgb(10 10 11 / 0.16);
+}
+
+/* Auf Tinte tragen Schatten nicht — Schwarz auf Schwarz ist keine Tiefe.
+   Dort ist die Flaechenhelligkeit der Traeger, und ein einziger sehr
+   weicher Schatten loest die Karte vom Grund. */
+.dark-section .price-cell {
+  --card-shadow: none;
+  --card-shadow-hover: 0 20px 48px rgb(0 0 0 / 0.55);
+}
+
+.price-cell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: var(--card-shadow-hover);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-short) var(--ease-out);
+}
+
+/* Nach dem Reveal setzt [data-reveal].reveal-done `transition: none`, um
+   die will-change-Reserve freizugeben. Die Zelle braucht ihren Weg danach
+   zurueck. */
+html.js .price-cell[data-reveal].reveal-done {
+  transition: translate var(--dur-short) var(--ease-out);
+}
+
+.price-card {
+  transition:
+    opacity var(--dur-short) var(--ease-micro),
+    background-color var(--dur-short) var(--ease-micro),
+    border-color var(--dur-short) var(--ease-micro);
+}
+
+/* Helle Karte: im Ruhezustand eine Spur Papier im Weiss, beim Hover reines
+   Weiss. Ohne die warme Ruhestufe koennte die Flaeche nicht heller werden —
+   Weiss hat keine Reserve nach oben. */
+.price-card--light {
+  --card-bg-hover: var(--color-white);
+  background: color-mix(in srgb, var(--color-paper) 25%, var(--color-white));
+}
+
+/* Die Business-Karte bringt ihre dunkle Flaeche selbst mit und sitzt auf
+   ink; die Wartungskarten liegen in einer dunklen Sektion auf ink-2 und
+   hellen eine Spur staerker auf, weil dort die Flaeche die Tiefe traegt. */
+.price-card.dark-section {
+  --card-bg-hover: color-mix(in srgb, var(--color-paper) 4%, var(--color-ink));
+}
+
+.dark-section .price-card {
+  --card-bg-hover: color-mix(in srgb, var(--color-paper) 5%, var(--color-ink-2));
+}
+
+/* Der Button ist bereits gefuellt, bevor der Zeiger ihn erreicht: 80 ms
+   Verzug beim Betreten, damit zuerst die Karte antwortet — beim Verlassen
+   kein Verzug. Welcher Akzent fuellt, entscheidet weiter unten der
+   Untergrund ueber --ghost-fill. */
+.price-card .btn {
+  transition:
+    background-color var(--dur-short) var(--ease-out),
+    border-color var(--dur-short) var(--ease-out),
+    color var(--dur-short) var(--ease-out);
+}
+
+/* Zeigerspitze: der volle Zustand. Die Flaechenfarben stehen inline am
+   Element — deshalb !important. */
+@media (hover: hover) and (pointer: fine) {
+  .price-cell:hover {
+    translate: 0 calc(-1 * var(--lift));
+    transition-duration: var(--dur-base);
+  }
+  .price-cell:hover::before {
+    opacity: 1;
+    transition-duration: var(--dur-base);
+  }
+  .price-cell:hover > .price-card {
+    background: var(--card-bg-hover) !important;
+  }
+  /* Auf Tinte hellt der Rand weiss auf, nicht farbig — eine Lichtkante,
+     keine Auswahl. Die markierte Karte behaelt ihren Akzentrahmen: er ist
+     Teil der Empfehlung und kein Zustand. */
+  .dark-section .price-cell:hover > .price-card:not(.price-card--marked) {
+    border-color: rgb(245 243 238 / 0.3) !important;
+  }
+  .price-cell:hover .btn-ghost {
+    background: var(--ghost-fill);
+    border-color: var(--ghost-fill);
+    color: var(--ghost-on);
+    transition-delay: 80ms;
+  }
+  .price-cell:hover .btn-primary {
+    background: var(--color-accent-800);
+    transition-delay: 80ms;
+  }
+}
+
+/* Tastatur sieht dasselbe wie die Maus. Der Fokus liegt auf dem Button —
+   ausgeloest wird der Zustand der ganzen Karte, sonst waere die
+   Vorbereitung eine reine Mausbelohnung. */
+.price-cell:has(.btn:focus-visible) {
+  translate: 0 calc(-1 * var(--lift));
+  transition-duration: var(--dur-base);
+}
+
+.price-cell:has(.btn:focus-visible)::before {
+  opacity: 1;
+  transition-duration: var(--dur-base);
+}
+
+.price-cell:has(.btn:focus-visible) > .price-card {
+  background: var(--card-bg-hover) !important;
+}
+
+.dark-section .price-cell:has(.btn:focus-visible) > .price-card:not(.price-card--marked) {
+  border-color: rgb(245 243 238 / 0.3) !important;
+}
+
+.price-cell:has(.btn:focus-visible) .btn-primary {
+  background: var(--color-accent-800);
+}
+
+/* Gedrueckt laeuft nichts nach. */
+.price-card .btn:active {
+  transition-delay: 0s;
+  transition-duration: var(--dur-micro);
+}
+
+/* Die Nachbarn treten zurueck — reine Fokushilfe, nie Traeger einer
+   Information: sie bleiben vollstaendig lesbar, ohne Graustufen und ohne
+   Weichzeichner. Ausloeser ist die Karte, nicht das Raster: sonst dunkelte
+   die Reihe schon ab, wenn der Zeiger nur in der Luecke steht.
+   Gestapelt (< 810 px) entfaellt das Abdunkeln ersatzlos — untereinander
+   wirkt es wie ein Fehler, nicht wie Fokus. */
+@media (min-width: 810px) {
+  @media (hover: hover) and (pointer: fine) {
+    .price-grid:has(.price-cell:hover) .price-card {
+      opacity: var(--dim-sibling);
+    }
+    .price-grid .price-cell:hover > .price-card {
+      opacity: 1;
+    }
+  }
+  .price-grid:has(.btn:focus-visible) .price-card {
+    opacity: var(--dim-sibling);
+  }
+  .price-grid .price-cell:has(.btn:focus-visible) > .price-card {
+    opacity: 1;
+  }
+}
+
+/* Reduzierte Bewegung: es bleiben der Flaechenwechsel und die
+   Button-Vorbereitung, beide kurz und ohne Verzug. Anhebung, Schatten und
+   Abdunkeln entfallen. */
+@media (prefers-reduced-motion: reduce) {
+  .price-cell,
+  html.js .price-cell[data-reveal].reveal-done {
+    transition: none;
+  }
+  .price-cell:hover,
+  .price-cell:has(.btn:focus-visible) {
+    translate: none;
+  }
+  .price-cell::before {
+    display: none;
+  }
+  .price-grid:has(.price-cell:hover) .price-card,
+  .price-grid:has(.btn:focus-visible) .price-card {
+    opacity: 1;
+  }
+  .price-card,
+  .price-card .btn {
+    transition-duration: var(--dur-micro);
+  }
+  .price-cell:hover .btn-ghost,
+  .price-cell:hover .btn-primary,
+  .price-cell:has(.btn:focus-visible) .btn-primary {
+    transition-delay: 0s;
+  }
+}
+
+/* Marker: Wort mit Akzent-Hinterlegung (Hero) */
+.marker {
+  position: relative;
+  white-space: nowrap;
+  z-index: 0;
+}
+
+/* Ohne JS sofort vollflächig; mit JS animiert (s. Animations-Block unten) */
+.marker::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: -0.04em;
+  right: -0.04em;
+  bottom: 0.06em;
+  height: 0.32em;
+  background: var(--color-accent-400);
+  transform-origin: left center;
+}
+
+/* ------------------------------------------------------------- Sektionen */
+
+.dark-section {
+  background: var(--color-ink);
+  color: var(--color-paper);
+  position: relative;
+  --color-accent-ctx: var(--color-accent-400);
+}
+
+/* Feines Korn auf dunklen Flächen — verhindert Banding, gibt Haptik */
+.grain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Rasterlinien-Hintergrund (Hero) */
+.grid-bg {
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 90% 75% at 50% 30%, black 30%, transparent 75%);
+}
+
+/* ------------------------------------------------------ Kachel-Sektionen
+   Gemeinsame Optik zweier Sektionen am Fuss der Leistungsseiten: der
+   Technologie-Sektion mit Markenzeichen und der Kennzahl-Sektion mit
+   Zielwerten. Beide zeigen dieselbe Karte — deshalb steht der Stil hier und
+   nicht zweimal in zwei Astro-Komponenten.
+
+   Der Grund bleibt Papier, nicht die vertiefte Flaeche: --color-mute ist
+   laut Token-Kommentar auf --color-paper auf AA gerechnet (4,75:1); auf
+   --color-paper-2 faellt derselbe Grauton auf 4,30:1. Eyebrow und Lead
+   stehen unmittelbar auf dem Sektionsgrund, also bleibt es bei Papier. Die
+   Karten grenzen sich ueber die Haarlinie ab, wie das Enthalten-Raster und
+   die FAQ-Zeilen weiter oben auf derselben Seite. */
+
+.tile-section {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding-block: var(--spacing-section-sm);
+}
+
+/* Spaltenzahl kommt von der Sektion (--tile-cols-md / --tile-cols-lg), damit
+   sich das Raster der Anzahl anpasst: sechs Kacheln laufen dreispaltig, zwei
+   oder vier zweispaltig. Sonst stuende bei zwei Eintraegen eine leere dritte
+   Spalte, und bei vier ein einzelner Nachzuegler in der zweiten Reihe.
+
+   Die Stufen sind die der uebrigen Seite (390 / 810 / 1200), nicht die
+   Tailwind-Vorgaben — sonst spraenge dieses Raster an anderen Stellen um als
+   das der Leistungs- und Preiszeilen. */
+.tile-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: 1fr;
+  /* Wenige Kacheln duerfen die Containerbreite nicht auseinanderziehen: bei
+     zwei oder vier Eintraegen deckelt die Sektion das Raster ueber
+     --tile-max, damit die Kachel ungefaehr so breit bleibt wie im
+     dreispaltigen Fall. Linksbuendig, wie Ueberschrift und Lead darueber.
+     Ohne den Deckel (sechs Kacheln) fuellt das Raster den Container wie
+     bisher — die Entwicklungsseite aendert sich dadurch nicht. */
+  max-width: var(--tile-max, none);
+}
+
+@media (min-width: 810px) {
+  .tile-grid {
+    grid-template-columns: repeat(var(--tile-cols-md, 2), minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .tile-grid {
+    grid-template-columns: repeat(var(--tile-cols-lg, 3), minmax(0, 1fr));
+  }
+}
+
+.tile {
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  padding: 1.75rem;
+  transition: border-color var(--dur-micro) var(--ease-micro);
+}
+
+/* Unter 390 px zaehlt jeder Millimeter Textbreite: engeres Polster, damit
+   lange Produktnamen wie "PostgreSQL" auch bei 280 px in einer Zeile bleiben. */
+@media (max-width: 389px) {
+  .tile {
+    padding: 1.25rem;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tile:hover {
+    border-color: rgb(10 10 11 / 0.28);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile {
+    transition: none;
+  }
+}
+
+.tile-title {
+  margin-top: 1.25rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.tile-text {
+  margin-top: 0.6rem;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+/* ------------------------------------------------------------- Animationen
+   Ein Trigger, ein Endzustand (.is-visible):
+     [data-reveal] → IntersectionObserver (alles unter dem Hero)
+   Der Hero bringt seine eigene Einblend-Staffelung mit ([data-fade]).
+   Startzustände gelten NUR unter html.js — ohne JS ist alles sichtbar.
+   Animiert wird ausschließlich transform + opacity. */
+
+html.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(var(--reveal-shift, var(--move-block)));
+  transition:
+    opacity var(--dur-reveal) var(--ease-out),
+    transform var(--dur-reveal) var(--ease-out);
+  transition-delay: var(--reveal-delay, 0s);
+  will-change: opacity, transform;
+}
+
+html.js [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Nach dem Reveal die will-change-Reservierung wieder freigeben */
+html.js [data-reveal].reveal-done {
+  will-change: auto;
+  transition: none;
+}
+
+/* Zeilen-Reveal (Hero-Headline und Sektions-Headlines):
+   Inhalt schiebt sich aus einer overflow-hidden-Maske von unten hoch. */
+.reveal-mask {
+  display: block;
+  overflow: hidden;
+  /* Platz für Unterlängen, ohne die Maske sichtbar zu machen */
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+
+html.js .reveal-mask {
+  opacity: 1;
+  transform: none;
+}
+
+html.js .reveal-mask .reveal-line {
+  display: block;
+  transform: translateY(110%);
+  transition: transform var(--dur-reveal) var(--ease-out);
+  transition-delay: var(--reveal-delay, 0s);
+  will-change: transform;
+}
+
+html.js .reveal-mask.is-visible .reveal-line {
+  transform: none;
+}
+
+html.js .reveal-mask.reveal-done .reveal-line {
+  will-change: auto;
+  transition: none;
+}
+
+/* Der grüne Unterstrich im Hero: skaliert von links auf */
+html.js .marker::after {
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--dur-reveal) var(--ease-out);
+  transition-delay: var(--marker-delay, 0.55s);
+}
+
+html.js .marker.is-visible::after {
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js [data-reveal],
+  html.js .reveal-mask .reveal-line {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  html.js .marker::after {
+    transform: scaleX(1);
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------------------ Prose
+   Markdown-Inhalte (Blog, Case Studies, Rechtstexte) */
+
+.prose {
+  max-width: 65ch;
+  line-height: 1.75;
+  font-size: 1.06rem;
+}
+
+.prose > * + * {
+  margin-top: 1.2em;
+}
+
+.prose h2 {
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1.15;
+  margin-top: 2.2em;
+  letter-spacing: -0.01em;
+}
+
+.prose h3 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 650;
+  margin-top: 1.8em;
+}
+
+.prose a {
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent-600);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.4em;
+}
+
+.prose ul {
+  list-style: disc;
+}
+
+.prose ol {
+  list-style: decimal;
+}
+
+.prose li + li {
+  margin-top: 0.5em;
+}
+
+.prose blockquote {
+  border-left: 3px solid var(--color-accent-600);
+  padding-left: 1.2em;
+  font-style: italic;
+  color: var(--color-mute);
+}
+
+.prose code {
+  background: var(--color-paper-2);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.prose pre {
+  background: var(--color-ink);
+  color: var(--color-paper);
+  padding: 1.2em 1.4em;
+  border-radius: 12px;
+  overflow-x: auto;
+}
+
+.prose pre code {
+  background: none;
+  padding: 0;
+}
+
+.prose img {
+  border-radius: 12px;
+}
+
+.prose strong {
+  font-weight: 650;
+}
+
+/* --------------------------------------------------------- Tabelle im Text
+   Gebraucht wird sie bisher nur von der Cookie-Seite, gehoert aber hierher:
+   eine Tabelle in einem Rechtstext ist Fliesstext-Inhalt wie eine Liste.
+
+   Sie steht in einem eigenen Scroll-Behaelter (.table-scroll). Ohne ihn
+   schiebt eine Tabelle die ganze Seite waagerecht auf, sobald sie breiter
+   ist als der Viewport — auf 280 px passiert das sofort. Der Behaelter
+   traegt tabindex und role="region", damit der Bereich auch per Tastatur
+   erreichbar und scrollbar ist; ein Scrollbereich, den nur die Maus
+   erreicht, ist keiner. */
+.table-scroll {
+  overflow-x: auto;
+  /* Ein zu schmaler Kasten quetscht die Spalten zu Buchstabensaeulen. Lieber
+     scrollen lassen — der Wert ist so gewaehlt, dass die Tabelle bis etwa
+     380 px Viewport ohne Scrollen auskommt. */
+  --table-min: 20rem;
+}
+
+.table-scroll:focus-visible {
+  outline: 3px solid var(--color-accent-600);
+  outline-offset: 3px;
+}
+
+.prose table {
+  min-width: var(--table-min);
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.prose caption {
+  caption-side: top;
+  text-align: left;
+  padding-bottom: 0.7em;
+  color: var(--color-mute);
+  font-size: 0.9rem;
+}
+
+.prose th,
+.prose td {
+  padding: 0.7em 0.9em;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.prose thead th {
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 0.88rem;
+  letter-spacing: 0.01em;
+  border-bottom-width: 2px;
+}
+
+.prose tbody th {
+  font-weight: 650;
+  /* Die erste Spalte nennt nur den Bereich — sie darf schmal bleiben, damit
+     der Erlaeuterungsspalte die Breite bleibt. */
+  width: 34%;
+}
+
+.prose tbody tr:last-child th,
+.prose tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.prose tbody tr:nth-child(even) {
+  background: var(--color-paper-2);
+}
+
+/* Auf schmalen Geraeten zaehlt jeder Pixel: knapperes Zellpolster und eine
+   niedrigere Mindestbreite. Bei 320 px kommt die Tabelle damit ohne
+   Seitwaertsscrollen aus, bei 280 px bleibt ein kurzer Rest — lieber der
+   als Spalten, in denen einzelne Buchstaben untereinander stehen. */
+@media (max-width: 559px) {
+  .table-scroll {
+    --table-min: 15rem;
+  }
+
+  .prose table {
+    font-size: 0.9rem;
+  }
+
+  .prose th,
+  .prose td {
+    padding: 0.6em 0.55em;
+  }
+
+  .prose tbody th {
+    width: 38%;
+  }
+}
+
+/* ------------------------------------------------------------- Intro-Rise
+   Einblenden fuer Inhalte oberhalb der Sichtgrenze (Seitenkoepfe, Titel).
+   Der IntersectionObserver aus Base.astro greift dort nicht zuverlaessig:
+   Was beim Laden schon sichtbar ist, loest kein Intersect-Ereignis aus.
+   Deshalb eine reine CSS-Animation mit `both` — sie endet immer sichtbar,
+   auch wenn sie nie startet. Die Klasse wurde in mehreren Layouts benutzt,
+   war aber nirgends definiert; hier ist sie. */
+
+html.js .intro-rise {
+  animation: intro-rise var(--dur-reveal) var(--ease-out) both;
+  animation-delay: var(--intro-delay, 0s);
+}
+
+@keyframes intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--move-block));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js .intro-rise {
+    animation: none;
+  }
+}
+
+/* --------------------------------------------------------- Seitenkopf
+   Feine Rasterlinien hinter dem Kopf jeder Unterseite: Sie geben den
+   Unterseiten einen eigenen Auftakt, ohne eine zweite Farbflaeche
+   einzufuehren. */
+
+.page-header:not(.dark-section)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 80% 100% at 20% 0%, black 5%, transparent 70%);
+  opacity: 0.6;
+}
+
+/* ------------------------------------------------------------ FAQ-Accordion
+   Markup (siehe FaqAccordion.astro / FaqItem.astro):
+
+     <faq-accordion>
+       .faq-item
+         h3.faq-head > button.faq-trigger[aria-expanded][aria-controls]
+         .faq-panel[role=region] > .faq-panel-inner
+
+   Warum kein <details>: Die Vorgabe verlangt das ARIA-Disclosure-Muster
+   (Button + region) und eine animierte Hoehe. Beides gibt <details> nicht her
+   — der `open`-Zustand kennt kein Dazwischen. Mehrere Panels duerfen offen
+   stehen; die Begruendung steht in FaqAccordion.astro.
+
+   Die Hoehe misst JS und schreibt sie als Inline-Wert; Kurve und Dauer stehen
+   hier, damit die Responsive-Stufe unter 810px automatisch greift. Nach dem
+   Oeffnen steht `height: auto` — dann stimmt die Hoehe auch nach einem Resize
+   ohne zweite Messung. Ohne JS bleibt jedes Panel offen: der Inhalt wiegt
+   schwerer als die Faltung.
+
+   Die drei FAQ-eigenen Zeitwerte (Textversatz beim Oeffnen, Textausblendung
+   und Kollaps-Versatz beim Schliessen) sind keine Site-Tokens — sie gehoeren
+   zu diesem Bauteil und stehen deshalb hier. */
+
+.faq-item {
+  --faq-text-in: 80ms; /* Text folgt dem Panel, er laeuft ihm nie voraus */
+  --faq-text-out: 140ms; /* Text ist weg, bevor die Hoehe kollabiert */
+  --faq-collapse-in: 40ms;
+  border-top: 1px solid var(--line);
+}
+
+.faq-head {
+  margin: 0;
+  font: inherit;
+}
+
+.faq-trigger {
+  appearance: none;
+  background: none;
+  border: 0;
+  color: inherit;
+}
+
+/* Ohne JS ist der Plus-Kreis eine Zusage, die niemand einloest. */
+html:not(.js) .faq-icon {
+  display: none;
+}
+
+/* ------------------------------------------------------------------ Panel */
+
+html.js .faq-panel {
+  height: 0;
+  overflow: hidden;
+}
+
+html.js .faq-panel-inner {
+  opacity: 0;
+  transform: translateY(var(--move-text));
+}
+
+/* Oeffnen: Hoehe zuerst, Text mit Versatz hinterher. */
+html.js .faq-item.is-open .faq-panel {
+  transition: height var(--dur-panel) var(--ease-panel);
+}
+
+html.js .faq-item.is-open .faq-panel-inner {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--dur-short) var(--ease-out) var(--faq-text-in),
+    transform var(--dur-short) var(--ease-out) var(--faq-text-in);
+}
+
+/* Schliessen: Text zuerst weg, Hoehe folgt versetzt und kuerzer als beim
+   Oeffnen. `transform: none` bleibt stehen — sonst rutschte der Text waehrend
+   des Ausblendens noch einmal um --move-text nach unten. */
+html.js .faq-item.is-closing .faq-panel {
+  transition: height var(--dur-panel-out) var(--ease-panel) var(--faq-collapse-in);
+}
+
+html.js .faq-item.is-closing .faq-panel-inner {
+  opacity: 0;
+  transform: none;
+  transition: opacity var(--faq-text-out) var(--ease-micro);
+}
+
+/* Zustand ohne Bewegung setzen (Suchtreffer aufklappen). Steht nach den
+   Zustandsregeln, gleiche Spezifitaet — die spaetere Regel gewinnt. */
+html.js .faq-item.is-instant .faq-panel,
+html.js .faq-item.is-instant .faq-panel-inner {
+  transition: none;
+}
+
+/* -------------------------------------------------------------------- Icon */
+
+.faq-icon {
+  position: relative;
+  height: 2rem;
+  width: 2rem;
+  flex: none;
+  border-radius: 999px;
+  /* Der Kreis zeigt an, dass die Zeile aufklappt, und traegt mit der
+     Drehung den Zustand — also Bedienelement-Stufe, nicht Haarlinie. */
+  border: 1px solid var(--line-control);
+  transition:
+    background-color var(--dur-micro) var(--ease-micro),
+    border-color var(--dur-micro) var(--ease-micro),
+    color var(--dur-micro) var(--ease-micro);
+}
+
+/* Ein einziges Plus-Glyph, gedreht — kein Icon-Austausch, kein Crossfade.
+   Der Kreis selbst dreht sich nicht, nur das Glyph; Origin ist seine Mitte,
+   sonst wandert das Kreuz beim Drehen aus dem Kreis. */
+.faq-glyph {
+  position: absolute;
+  inset: 0;
+  transform: rotate(0deg);
+  transform-origin: 50% 50%;
+  transition: transform var(--dur-base) var(--ease-panel);
+}
+
+.faq-bar {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background: currentColor;
+  transform: translate(-50%, -50%);
+}
+
+.faq-bar-v {
+  height: 0.75rem;
+  width: 1.5px;
+}
+
+.faq-bar-h {
+  height: 1.5px;
+  width: 0.75rem;
+}
+
+.faq-item.is-open .faq-icon {
+  background-color: var(--color-accent-600);
+  border-color: var(--color-accent-600);
+  color: var(--color-white);
+}
+
+.faq-item.is-open .faq-glyph {
+  transform: rotate(45deg);
+}
+
+.faq-num {
+  color: var(--color-mute);
+  transition: color var(--dur-micro) var(--ease-micro);
+}
+
+/* ------------------------------------------------------------------ Hover
+   Nur auf Zeigergeraeten, und ohne jede Verschiebung: Die Zeile ist
+   vollstaendig Klickflaeche, sie muss beim Zielen stillhalten. */
+
+@media (hover: hover) and (pointer: fine) {
+  .faq-trigger:hover .faq-num {
+    color: var(--color-accent-600);
+  }
+
+  .faq-trigger:hover .faq-icon {
+    border-color: var(--color-ink);
+  }
+
+  .faq-item.is-open .faq-trigger:hover .faq-icon {
+    border-color: var(--color-accent-600);
+  }
+}
+
+@media (hover: none) {
+  .faq-trigger:active .faq-icon {
+    border-color: var(--color-ink);
+  }
+}
+
+/* --------------------------------------------------------- Reduced Motion
+   Hoehe und Rotation schalten ab, die Deckkraft darf bleiben: Sie erklaert
+   den Wechsel, ohne etwas zu bewegen. */
+
+@media (prefers-reduced-motion: reduce) {
+  html.js .faq-item.is-open .faq-panel,
+  html.js .faq-item.is-closing .faq-panel,
+  html.js .faq-glyph {
+    transition-duration: 0.01ms;
+    transition-delay: 0s;
+  }
+
+  html.js .faq-panel-inner,
+  html.js .faq-item.is-open .faq-panel-inner,
+  html.js .faq-item.is-closing .faq-panel-inner {
+    transform: none;
+    transition: opacity var(--dur-micro) var(--ease-micro);
+  }
+}
+
+/* -------------------------------------------------------- Reveal der Zeilen
+   Der Container traegt `data-reveal` und dient nur als Ausloeser — sein
+   eigener Startzustand ist neutralisiert. So bleiben die Trennlinien stehen
+   und bewegt wird ausschliesslich der Zeileninhalt. Die Zeilenhoehe steht
+   dabei von Anfang an: kein Layout-Shift.
+   Ausgeloest wird ueber den vorhandenen Observer in Base.astro (15 % im
+   Viewport, einmalig) — ein zweiter Beobachter waere ein zweites Verhalten. */
+
+faq-accordion {
+  display: block;
+}
+
+html.js [data-faq-rows][data-reveal] {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+html.js [data-faq-rows] .faq-trigger {
+  opacity: 0;
+  transform: translateY(var(--move-block));
+  transition:
+    opacity var(--dur-reveal) var(--ease-out),
+    transform var(--dur-reveal) var(--ease-out);
+  /* 120 ms nach der linken Spalte, danach --stagger je Zeile */
+  transition-delay: calc(120ms + var(--i, 0) * var(--stagger));
+}
+
+html.js [data-faq-rows].is-visible .faq-trigger {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js [data-faq-rows] .faq-trigger {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------------ Flaechen-Hover
+   Ein Kreis in der Akzentfarbe laeuft vom Cursor aus ueber die Flaeche und
+   faerbt sie voll ein. Gilt fuer genau drei Bauteile: die Leistungs-Zeilen der
+   Startseite (.service-row), die kleinen Karten "Weitere Leistungen"
+   (.other-card) und die grossen Leistungs-Karten (.service-card). Buttons,
+   Navigation, FAQ und Preistabelle behalten die dezenten Hover-Regeln.
+
+   Aufbau (JS baut ihn in Base.astro, siehe dort):
+
+     .fx-fill              das Bauteil selbst, Bezugsrahmen
+       .fx-clip            unbewegte Maske, schneidet den Kreis am Rand ab
+         .fx-circle        der Kreis, Groesse und Ort vom Cursor
+           .fx-clone       Kopie des Inhalts in den hellen Farben
+       …Inhalt             das Original, von der Maske zugedeckt
+
+   Warum eine Kopie statt umgefaerbtem Text: so sitzt der Farbwechsel exakt an
+   der Kreiskante — kein Delay, das man nachjustieren muesste, und nichts, was
+   der Kante vorauseilt.
+
+   Warum die Maske ein eigenes Element ist und nicht `overflow: hidden` am
+   Bauteil: das wuerde die Fokus-Outline der enthaltenen Links abschneiden.
+
+   Der Kreis skaliert (transform), der Klon skaliert exakt gegen (1/s) um
+   denselben Punkt — zusammengesetzt bleibt der Inhalt bei 1:1 stehen und nur
+   die Kante wandert. Beide lesen dieselbe animierte Zahl --fx-s, deshalb ist
+   sie als @property registriert: unregistriert liesse sie sich nicht
+   uebergehen. max(…, 0.02) haelt die Division vom Nullpunkt fern; der Rest
+   liegt in einem Kreis von wenigen Pixeln und ist nicht sichtbar. */
+
+@property --fx-s {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+.fx-fill {
+  position: relative;
+  --fx-inset: 0px;
+  --fx-dur: 600ms;
+}
+
+/* Karten: die Maske deckt auch den 1px-Rand ab, sonst bliebe ein heller Ring
+   um die gefuellte Flaeche stehen. Die Zeilen bekommen 0 — ihre Haarlinie
+   liegt ausserhalb der Maske und bleibt damit unberuehrt sichtbar. */
+.fx-card {
+  --fx-inset: -1px;
+}
+
+/* Die Flaeche bestimmt die Zeit, nicht umgekehrt. */
+.service-row {
+  --fx-dur: 830ms;
+}
+.service-card {
+  --fx-dur: 735ms;
+}
+.other-card {
+  --fx-dur: 616ms;
+}
+
+/* Unter 810 px ist der Weg kuerzer: gleiche Kurve, 20 % knapper. */
+@media (max-width: 809px) {
+  .service-row {
+    --fx-dur: 664ms;
+  }
+  .service-card {
+    --fx-dur: 588ms;
+  }
+  .other-card {
+    --fx-dur: 493ms;
+  }
+}
+
+/* ---------------------------------------------- Ueberstand der Zeilenflaeche
+   Nummer und Pfeil sitzen buendig an den Kanten der Inhaltsspalte. Endete die
+   Farbe dort, klebten beide am Rand. Statt den Inhalt einzuruecken — dann
+   verloere er die Flucht mit der Sektionsueberschrift — waechst die Flaeche
+   nach aussen in den Seitenrand hinein. Der Inhalt bleibt, wo er ist.
+
+   Gedeckelt wird auf den schmaleren der beiden Seitenraender minus 8 px; wie
+   viel Platz dort wirklich ist, misst JS und legt es als --fx-room ab. So
+   laeuft die Flaeche nie aus dem Viewport, auch nicht bei 280 px. Der
+   Ueberstand deckt zugleich die 6 px ab, die der Pfeil beim Hover wandert.
+
+   Vertikal geht die Flaeche NICHT bis an die Kante: 1 px vor der Haarlinie
+   ist Schluss, oben wie unten. Die Linien behalten damit ihre Ruhefarbe und
+   bleiben im Hover an derselben Stelle sichtbar wie ueberall sonst. */
+
+.service-row {
+  --fx-bleed-want: 16px;
+  --fx-bleed: max(0px, min(var(--fx-bleed-want), calc(var(--fx-room, 0px) - 8px)));
+  --fx-inset: 1px calc(-1 * var(--fx-bleed)) 1px calc(-1 * var(--fx-bleed));
+}
+
+@media (min-width: 390px) {
+  .service-row {
+    --fx-bleed-want: 24px;
+  }
+}
+
+@media (min-width: 810px) {
+  .service-row {
+    --fx-bleed-want: 32px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .service-row {
+    --fx-bleed-want: 40px;
+  }
+}
+
+/* Die Maske liegt ueber dem Inhalt und deckt ihn mit dem Kreis zu — darunter
+   liegt die helle Kopie. Der Inhalt wird also bewusst NICHT angehoben: sonst
+   stuende das dunkle Original ueber der Kopie und der Farbwechsel bliebe aus.
+   Geklickt wird trotzdem durch (pointer-events: none). */
+.fx-clip {
+  position: absolute;
+  inset: var(--fx-inset);
+  /* Ueber allem, was im Bauteil einen eigenen Stapelkontext aufmacht — der
+     verschobene Pfeil ist durch sein transform genau so ein Fall und lag
+     sonst als dunkle Grafik auf der gefuellten Flaeche. */
+  z-index: 1;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Grundzustand ohne Kreis: volle Flaeche ueber die Deckkraft. Das ist der
+   Zustand fuer Touch (:active) und fuer reduzierte Bewegung. */
+.fx-circle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-accent-600);
+  opacity: 0;
+  transition: opacity var(--dur-micro) var(--ease-micro);
+}
+
+.fx-fill.is-fx-on .fx-circle {
+  opacity: 1;
+}
+
+.fx-clone {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: none;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--color-white);
+}
+
+/* ------------------------------------------------- Zeigergeraet mit Kreis */
+
+html.fx-radial .fx-fill {
+  --fx-s: 0;
+  --fx-t: var(--dur-fill-out); /* raus ist schneller als rein */
+  --fx-e: var(--ease-out);
+}
+
+html.fx-radial .fx-fill.is-fx-on {
+  --fx-s: 1;
+  --fx-t: var(--fx-dur);
+  --fx-e: var(--ease-fill);
+}
+
+/* Groesse und Ort setzt JS in Pixeln, ohne Uebergang: nur --fx-s laeuft.
+   Der Uebergang haengt am Kreis, nicht am Bauteil — die Reveal-Regeln
+   ueberschreiben `transition` auf jedem [data-reveal]-Element komplett. */
+html.fx-radial .fx-circle {
+  width: auto;
+  height: auto;
+  border-radius: 50%;
+  opacity: 1;
+  transform: scale(var(--fx-s));
+  transform-origin: center;
+  transition: --fx-s var(--fx-t) var(--fx-e);
+}
+
+html.fx-radial .fx-clone {
+  transform: scale(calc(1 / max(var(--fx-s), 0.02)));
+}
+
+/* ------------------------------------------------------- Farben im Klon
+   Die einzige Stelle, an der die hellen Werte stehen. Alles, was im
+   Ruhezustand die Akzentfarbe traegt — Icons, Haken, "Mehr erfahren" —
+   wechselt zwingend mit, sonst verschwindet es auf der Flaeche.
+   Reihenfolge zaehlt: die knapperen Rollen stehen nach .text-mute. */
+
+/* Die Abstufung stand vorher bei 0.75 / 0.85 / 0.55 und trug auf der
+   gefuellten Flaeche 3.74:1, 4.34:1 und 2.72:1 — alle drei unter AA. Der
+   Hover ist ein Zustand wie jeder andere und muss lesbar sein. Die
+   Rangfolge bleibt erhalten, sie beginnt nur eine Stufe hoeher:
+     0.90  4.67:1      0.95  5.00:1      0.86  4.42 → 0.88 = 4.53:1 */
+.fx-clone .text-mute {
+  color: rgb(255 255 255 / 0.9); /* Fliesstext — 4.67:1 */
+}
+
+.fx-clone .fx-list {
+  color: rgb(255 255 255 / 0.95); /* Listentext — 5.00:1 */
+}
+
+.fx-clone .fx-dim {
+  color: rgb(255 255 255 / 0.88); /* Nummer, Label — 4.53:1 */
+}
+
+.fx-clone .row-arrow,
+.fx-clone .text-accent-600 {
+  color: var(--color-white);
+}
+
+.fx-clone .border-t {
+  border-color: rgb(255 255 255 / 0.2);
+}

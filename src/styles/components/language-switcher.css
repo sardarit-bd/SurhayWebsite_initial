@@ -1,0 +1,228 @@
+/* Aus src/components/LanguageSwitcher.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-language-switcher] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-language-switcher="" an jedes eigene Element. */
+
+/* Feine Kante an jeder Flagge — sonst verschwimmen die hellen Flaechen
+     (Weiss in TR und GB, Gold in DE) auf dem Papierton. Alle drei bekommen
+     sie, sonst wirkt eine Flagge angeschnitten. `content-box`, damit die
+     Kante das Seitenverhaeltnis des Bildes nicht verzerrt. */.flag[data-c-language-switcher] {
+    box-sizing: content-box;
+    display: block;
+    flex: none;
+    height: 12px;
+    width: auto;
+    border: 1px solid rgb(10 10 11 / 0.18);
+    border-radius: 2px;
+  }
+
+  /* ------------------------------------------------------------ Dropdown */.lang[data-c-language-switcher] {
+    position: relative;
+  }
+
+  /* Bei offenem Burger-Menue traegt die Liste im Overlay die Sprachwahl —
+     das Aufklappmenue der Leiste laege sonst darueber.
+     Die Regel steht hier und nicht in Header.astro: Astro haengt an `.lang`
+     das Bereichs-Attribut DIESER Datei; eine Regel aus dem Elternbauteil
+     traegt ein anderes und greift nie. */header.menu-open .lang[data-c-language-switcher] {
+    display: none;
+  }
+
+  /* Unter 640 px traegt das Burger-Menue die Sprachwahl (Variante `list`):
+     Dort stehen alle drei Sprachen offen nebeneinander, mit 44 px hohen
+     Zielen. In der Leiste ist daneben kein Platz mehr — Logo, Umschalter,
+     Schaltflaeche und Burger brauchen zusammen rund 485 px. */@media (max-width: 639px){
+    .lang[data-c-language-switcher] {
+      display: none;
+    }
+  }
+
+  .lang-button[data-c-language-switcher] {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    /* 44 px hoch — dasselbe Ziel wie der Burger daneben. */
+    min-height: 44px;
+    padding-inline: 0.35rem;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--color-mute);
+    background: none;
+    cursor: pointer;
+    transition: color var(--dur-micro) var(--ease-micro);
+  }
+  .lang-button[aria-expanded='true'][data-c-language-switcher] {
+    color: var(--color-ink);
+  }
+  @media (hover: hover) and (pointer: fine){
+    .lang-button[data-c-language-switcher]:hover {
+      color: var(--color-ink);
+    }
+  }
+
+  .lang-code[data-c-language-switcher] {
+    text-transform: uppercase;
+  }
+
+  .lang-caret[data-c-language-switcher] {
+    width: 0.625rem;
+    height: 0.375rem;
+    transition: transform var(--dur-base) var(--ease-panel);
+  }
+  .lang-button[aria-expanded='true'][data-c-language-switcher] .lang-caret[data-c-language-switcher] {
+    transform: rotate(180deg);
+  }
+
+  /* Gleiche Flaeche wie das Leistungs-Aufklappmenue in der Navigation. */.lang-menu[data-c-language-switcher] {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.25rem);
+    z-index: var(--z-sticky);
+    min-width: 11.5rem;
+    padding: 0.35rem;
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+    background: var(--color-paper);
+    box-shadow: 0 28px 60px -30px rgb(10 10 11 / 0.45);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition:
+      opacity var(--dur-short) var(--ease-out),
+      transform var(--dur-short) var(--ease-out),
+      visibility 0s linear var(--dur-short);
+  }
+  .lang-menu.open[data-c-language-switcher] {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition:
+      opacity var(--dur-short) var(--ease-out),
+      transform var(--dur-short) var(--ease-out),
+      visibility 0s;
+  }
+
+  .lang-option[data-c-language-switcher] {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 44px;
+    padding: 0 0.7rem;
+    border-radius: 0.7rem;
+    font-size: 0.9rem;
+    color: var(--color-ink);
+    text-decoration: none;
+    transition: background-color var(--dur-micro) var(--ease-micro);
+  }
+  @media (hover: hover) and (pointer: fine){
+    .lang-option[data-c-language-switcher]:hover {
+      background: var(--color-paper-2);
+    }
+  }
+
+  .lang-name[data-c-language-switcher] {
+    flex: 1;
+  }
+
+  .lang-short[data-c-language-switcher] {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--color-mute);
+  }
+
+  /* Die aktive Sprache traegt drei Merkmale, nicht nur Farbe: Schriftgewicht,
+     Akzentfarbe und den Punkt rechts. So bleibt sie auch ohne Farbwahrnehmung
+     und in Graustufen erkennbar. */.lang-option.is-current[data-c-language-switcher] {
+    font-weight: 650;
+    color: var(--color-accent-800);
+    background: var(--color-accent-100);
+  }
+  .lang-option.is-current[data-c-language-switcher] .lang-short[data-c-language-switcher] {
+    color: var(--color-accent-800);
+  }
+  .lang-option.is-current[data-c-language-switcher]::after {
+    content: '';
+    width: 0.35rem;
+    height: 0.35rem;
+    border-radius: 50%;
+    background: var(--color-accent-600);
+  }
+
+  /* ------------------------------------------------- Liste (Burger-Menue) */.lang-list-label[data-c-language-switcher] {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-mute-dark);
+  }
+
+  .lang-list-items[data-c-language-switcher] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.7rem;
+  }
+
+  .lang-tile[data-c-language-switcher] {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0 0.9rem;
+    border: 1px solid var(--line-dark);
+    border-radius: 999px;
+    color: var(--color-mute-dark);
+    text-decoration: none;
+    transition:
+      color var(--dur-micro) var(--ease-micro),
+      border-color var(--dur-micro) var(--ease-micro);
+  }
+  @media (hover: hover) and (pointer: fine){
+    .lang-tile[data-c-language-switcher]:hover {
+      color: var(--color-paper);
+      border-color: var(--color-mute-dark);
+    }
+  }
+
+  .lang-tile-text[data-c-language-switcher] {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+  }
+
+  .lang-short-strong[data-c-language-switcher] {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+  .lang-tile[data-c-language-switcher] .lang-name[data-c-language-switcher] {
+    font-size: 0.85rem;
+  }
+
+  /* Auf Tinte traegt der Akzent-Vollton zu wenig Kontrast — hier gilt das
+     helle Gegenstueck, plus Rahmen und Gewicht als zweites Merkmal. */.lang-tile.is-current[data-c-language-switcher] {
+    color: var(--color-accent-400);
+    border-color: var(--color-accent-400);
+    font-weight: 650;
+  }
+
+  /* Bei 320 px und darunter passen drei Pillen nicht mehr nebeneinander —
+     sie brechen um, statt die Zeile aus dem Viewport zu schieben. */@media (max-width: 359px){
+    .lang-tile[data-c-language-switcher] {
+      padding-inline: 0.7rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .lang-menu[data-c-language-switcher],
+    .lang-caret[data-c-language-switcher],
+    .lang-button[data-c-language-switcher],
+    .lang-option[data-c-language-switcher],
+    .lang-tile[data-c-language-switcher] {
+      transition: none;
+    }
+  }

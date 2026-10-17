@@ -1,0 +1,447 @@
+/* Aus src/components/sections/Hero.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-hero] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-hero="" an jedes eigene Element. */
+
+/* ------------------------------------------------------------- Achse
+     Alles zentriert. Von der Hero-Oberkante bis zum ersten Element 13vh;
+     die Navigation ist fixiert, ihre 72 px kommen oben drauf. */.hero[data-c-hero] {
+    /* --uebergang wird hier gesetzt, nicht inline: ein Inline-Style schlaegt
+       jede Media Query, die mobile Verkuerzung griffe sonst nicht. */
+    --uebergang: var(--uebergang-desktop);
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: calc(72px + 13vh);
+    padding-bottom: clamp(2rem, 6vh, 4rem);
+    padding-inline: 1.25rem;
+    text-align: center;
+    /* `clip` statt `hidden`: es entsteht kein Scroll-Container. */
+    overflow-x: clip;
+  }
+
+  /* Rasterlinien liegen hinter allem und werden zum Rand hin ausmaskiert
+     (die Maske steckt in .grid-bg). */.raster[data-c-hero] {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .col[data-c-hero] {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 900px;
+  }
+
+  .kicker[data-c-hero] {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-mute);
+  }
+
+  /* Derselbe Punkt wie bei jedem .eyebrow der Seite — und dieselbe Farbe:
+     --color-accent-ctx ist auf hellem Grund der Vollton (4.83:1), auf
+     dunklem der helle (10.95:1). Vorher stand hier accent-400 fest, das auf
+     Papier nur 1.63:1 traegt und den Punkt praktisch verschwinden liess.
+     Er ist Schmuck, kein Bedeutungstraeger — aber es gibt keinen Grund,
+     warum ausgerechnet der erste Punkt der Startseite der einzige sein
+     sollte, den man nicht sieht. */.kicker[data-c-hero]::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-accent-ctx);
+    flex: none;
+  }
+
+  .headline[data-c-hero] {
+    --lh: 1.05;
+    /* Maskenhoehe. Rechnerisch waere 1em x line-height richtig — am Pixel
+       gemessen beruehrt ein Umlaut dabei die Oberkante: die Punkte des Ä
+       ragen ueber den Zeilenkasten hinaus und wuerden abgeschnitten.
+       1.28em gibt allen Labels Luft. Die Zeilenhoehe bleibt unberuehrt —
+       .h-line-2 haelt sie fest auf 1em x line-height. */
+    --rot-h: 1.28em;
+
+    margin: 24px 0 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, 6.4vw, 4rem);
+    line-height: var(--lh);
+    letter-spacing: -0.03em;
+    font-weight: 700;
+    text-wrap: balance;
+    font-variation-settings: 'opsz' 96, 'wdth' 92;
+  }
+
+  .h-line[data-c-hero] {
+    display: block;
+  }
+
+  /* Zeile 2 haelt ihre Hoehe fest auf 1em x line-height. Die Maske darf
+     hoeher sein und ragt sichtbar heraus, ohne den Zeilenkasten zu dehnen —
+     dadurch bleibt der Abstand zu Zeile 1 exakt wie bei einer normalen Zeile. */.h-line-2[data-c-hero] {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.28em;
+    height: calc(1em * var(--lh));
+    /* Die Maske ist auf das laengste Label fixiert, damit „gebaut für“ nicht
+       springt. Bei kurzen Woertern bliebe rechts Leerraum und die Zeile saehe
+       deutlich links der Mitte aus. Der Ausgleich laeuft ueber transform,
+       gleiche Dauer und Kurve wie der Wortwechsel — die Zeile gleitet mit,
+       statt zu springen. Der Wert kommt aus dem Skript. */
+    transform: translateX(var(--shift, 0px));
+    transition: transform var(--uebergang) var(--ease-out);
+  }
+
+  .built[data-c-hero] {
+    flex: none;
+  }
+
+  /* Der Wechsler. Alle Woerter liegen im selben Rasterfeld, die Breite
+     richtet sich damit nach dem laengsten — „gebaut fuer“ bleibt dadurch
+     an Ort und Stelle, egal welches Wort steht. */.rot[data-c-hero] {
+    display: inline-grid;
+    /* Die Woerter sitzen mittig in der Maske statt oben — dadurch liegt der
+       Ueberstand symmetrisch und Umlautpunkte koennen nicht anstossen. */
+    align-items: center;
+    flex: none;
+    height: var(--rot-h);
+    overflow: hidden;
+    color: var(--color-accent-600);
+    text-align: left;
+  }
+
+  .rot-word[data-c-hero] {
+    grid-area: 1 / 1;
+    white-space: nowrap;
+    /* Startposition: unterhalb der Maske. */
+    transform: translateY(100%);
+    opacity: 0;
+    will-change: transform;
+    transition:
+      transform var(--uebergang) var(--ease-out),
+      opacity var(--uebergang) var(--ease-out);
+  }
+
+  .rot-word[data-on][data-c-hero] {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  /* Das abgeloeste Wort faehrt nach oben aus der Maske. */.rot-word[data-out][data-c-hero] {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  .sub[data-c-hero] {
+    max-width: 620px;
+    margin: 32px 0 0;
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--color-mute);
+    text-wrap: pretty;
+  }
+
+  .actions[data-c-hero] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.75rem;
+    margin-top: 40px;
+  }
+
+  /* Sekundaer bewusst als Textlink ohne Rahmen. */.secondary[data-c-hero] {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--color-ink);
+    text-decoration: none;
+    padding-bottom: 2px;
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--dur-micro) var(--ease-micro);
+  }
+
+  @media (hover: hover) and (pointer: fine){
+    .secondary[data-c-hero]:hover {
+      border-bottom-color: var(--color-ink);
+    }
+  }
+
+  /* --------------------------------------------------------- Beleg-Zeile */
+  /* Fester Zeilenraum fuer zwei Zeilen: unterschiedlich lange Belege duerfen
+     den Abstand darunter nicht veraendern. */.proof[data-c-hero] {
+    display: grid;
+    margin: clamp(2.5rem, 6vh, 4rem) 0 0;
+    min-height: calc(2 * 13px * 1.4);
+    align-items: start;
+  }
+
+  .proof-line[data-c-hero] {
+    grid-area: 1 / 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-mute);
+    opacity: 0;
+    transition: opacity var(--uebergang) var(--ease-micro);
+  }
+
+  .proof-line[data-c-hero]::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-accent-ctx);
+    flex: none;
+  }
+
+  .proof-line[data-on][data-c-hero] {
+    opacity: 1;
+  }
+
+  /* ---------------------------------------------------------- Anhalten
+     Leise gesetzt: Er ist eine Zusicherung, kein Angebot. 44x44 als
+     Trefferflaeche (WCAG 2.5.8 verlangt 24, 44 ist die bequeme Groesse),
+     der Rahmen in der Bedienelement-Stufe, damit er als Knopf erkennbar
+     ist (WCAG 1.4.11, 3:1). */.motion-toggle[data-c-hero] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-top: 1.25rem;
+    border: 1px solid var(--line-control);
+    border-radius: 999px;
+    color: var(--color-mute);
+    background: transparent;
+    cursor: pointer;
+    transition:
+      color var(--dur-micro) var(--ease-micro),
+      border-color var(--dur-micro) var(--ease-micro);
+  }
+
+  .motion-toggle[hidden][data-c-hero] {
+    display: none;
+  }
+
+  .motion-icon[data-c-hero] {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  /* Genau ein Glyph steht: Pause, solange es laeuft — Play, sobald es haelt. */.motion-toggle[data-c-hero] .motion-icon-play[data-c-hero],
+.motion-toggle[aria-pressed='true'][data-c-hero] .motion-icon-pause[data-c-hero] {
+    display: none;
+  }
+
+  .motion-toggle[aria-pressed='true'][data-c-hero] .motion-icon-play[data-c-hero] {
+    display: block;
+  }
+
+  @media (hover: hover) and (pointer: fine){
+    .motion-toggle[data-c-hero]:hover {
+      color: var(--color-ink);
+      border-color: var(--color-ink);
+    }
+  }
+
+  /* Angehalten: die Icons im Hintergrund frieren mitten in der Bewegung
+     ein, statt an ihre Ausgangsposition zu springen. */.hero.is-paused[data-c-hero] .icon-slot[data-c-hero] {
+    animation-play-state: paused;
+  }
+
+  /* ------------------------------------------------------------- Icons
+     Hintergrund, nicht Inhalt: geringe Deckkraft, langsam, ausschliesslich
+     in den Raendern ausserhalb der 900px-Textspalte. */.icons[data-c-hero] {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .icon-set[data-c-hero] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity var(--uebergang) var(--ease-out);
+  }
+
+  .icon-set[data-on][data-c-hero] {
+    opacity: 1;
+  }
+
+  .icon-slot[data-c-hero] {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--s);
+    height: var(--s);
+    margin: calc(var(--s) / -2);
+    /* Schweben laeuft durch und wird beim Segmentwechsel nicht neu
+       gestartet — sonst zuckt jedes Icon. */
+    animation: schweben var(--dauer) ease-in-out var(--verzug) infinite;
+  }
+
+  /* Ein- und Ausblenden gestaffelt, die Schwebe-Animation bleibt unberuehrt:
+     deshalb sitzt sie auf dem Slot und die Deckkraft auf dem <svg>. */.icon-slot[data-c-hero] svg[data-c-hero] {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: var(--color-accent-600);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0;
+    transform: scale(0.92);
+    transition:
+      opacity var(--uebergang) var(--ease-out) var(--staffel),
+      transform var(--uebergang) var(--ease-out) var(--staffel);
+  }
+
+  .icon-set[data-on][data-c-hero] .icon-slot[data-c-hero] svg[data-c-hero] {
+    opacity: var(--icon-deckkraft);
+    transform: scale(1);
+  }
+
+  /* Auslenkung bleibt unter 12px — groessere Wege lesen sich als Bewegung
+     im Vordergrund und ziehen den Blick von der Headline weg. */@keyframes schweben{
+    0%,
+    100%{
+      transform: translate(0, 0) rotate(0deg);
+    }
+    33%{
+      transform: translate(4px, -9px) rotate(2.5deg);
+    }
+    66%{
+      transform: translate(-3px, 6px) rotate(-2deg);
+    }
+  }
+
+  /* ------------------------------------------------------------ Bewegung
+     Ohne JS bleibt alles sichtbar — der Startzustand gilt nur unter html.js. */[data-fade][data-c-hero] {
+    transition:
+      opacity var(--dur-reveal) var(--ease-out),
+      transform var(--dur-reveal) var(--ease-out);
+    transition-delay: calc(var(--i, 0) * var(--stagger));
+  }
+
+  html.js [data-fade][data-c-hero] {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  html.js [data-fade].in[data-c-hero] {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ---------------------------------------------------------- Responsive */
+  /* 900–1279px: nur noch zwei Icons (Positionen 1 und 4), Auslenkung
+     zurueckgenommen. Darunter gibt es keinen Rand mehr, in dem sie stehen
+     koennten, ohne den Text zu stoeren — dann ersatzlos weg. */@media (max-width: 1279px){
+    .icon-slot[data-c-hero]:nth-child(2),
+    .icon-slot[data-c-hero]:nth-child(3) {
+      display: none;
+    }
+
+    @keyframes schweben{
+      0%,
+      100%{
+        transform: translate(0, 0) rotate(0deg);
+      }
+      33%{
+        transform: translate(3px, -6px) rotate(2deg);
+      }
+      66%{
+        transform: translate(-2px, 4px) rotate(-1.5deg);
+      }
+    }
+  }
+
+  @media (max-width: 899px){
+    .icons[data-c-hero] {
+      display: none;
+    }
+  }
+
+  @media (max-width: 767px){
+    .headline[data-c-hero] {
+      font-size: clamp(2.25rem, 9vw, 3rem);
+      /* Volle Viewport-Breite: „Handwerk & Bau“ passt sonst weder neben
+         „gebaut für“ noch in die gepolsterte Spalte. So bleibt die
+         Schriftgroesse unangetastet. */
+      margin-inline: -1.25rem;
+    }
+
+    /* Der Wechsler rutscht auf eine eigene dritte Zeile, statt die Groesse
+       zu reduzieren. Die Hoehe ist dadurch weiterhin konstant. */.h-line-2[data-c-hero] {
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      height: auto;
+    }
+
+    /* Auf eigener Zeile steht kein „gebaut für“ mehr daneben — das Wort
+       gehoert dann in die Mitte der Maske, nicht an ihren linken Rand. */.rot[data-c-hero] {
+      justify-items: center;
+      text-align: center;
+    }
+
+    .actions[data-c-hero] {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1rem;
+    }
+
+    .cta[data-c-hero] {
+      width: 100%;
+    }
+
+    .secondary[data-c-hero] {
+      justify-content: center;
+    }
+
+    /* Nur der Uebergang wird kuerzer, der Takt bleibt bei ZYKLUS_MS. */.hero[data-c-hero] {
+      --uebergang: var(--uebergang-mobil);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    [data-fade][data-c-hero],
+    html.js [data-fade][data-c-hero] {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+
+    /* Statisch das erste Segment, kein Timer (siehe Skript). */.rot-word[data-c-hero],
+.proof-line[data-c-hero],
+.h-line-2[data-c-hero],
+.icon-slot[data-c-hero] svg[data-c-hero] {
+      transition: none;
+    }
+
+    /* Icons stehen still an ihren Positionen — nicht ausblenden, die
+       Komposition soll erhalten bleiben. */.icon-slot[data-c-hero] {
+      animation: none;
+    }
+  }

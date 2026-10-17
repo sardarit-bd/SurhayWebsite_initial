@@ -1,0 +1,14 @@
+/* Aus src/components/sections/Insights.astro (Astro-Fassung), <style>-Block.
+   Die Regeln sind unveraendert; hinzugekommen ist nur die Bereichskennung
+   [data-c-insights] an jedem Compound — dieselbe Umschreibung, die Astro mit
+   data-astro-cid-* vornahm. Erzeugt von scripts/gen-scoped-css.mjs.
+   Die Komponente setzt data-c-insights="" an jedes eigene Element. */
+
+/* Zustand und Kurven stehen in global.css (.card-link, .read-more).
+     Hier nur die Flaechenfarbe: Der Teaser liegt auf Papier, nicht auf
+     Weiss, und braucht deshalb einen eigenen — ebenso kleinen — Schritt.
+     Einen eigenen Rahmen bekommt er nicht: die drei Teaser teilen sich die
+     Haarlinien des Rasters (gap-px), ein Rahmenwechsel wuerde daran ziehen.
+     Flaeche, Unterlinie und Pfeil tragen den Zustand allein. */.post[data-c-insights] {
+    --card-bg-hover: color-mix(in srgb, var(--color-paper-2) 45%, var(--color-paper));
+  }
